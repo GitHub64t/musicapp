@@ -111,7 +111,7 @@ void _seekTo(double value) {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xff663FB9),
+             
               Color(0xff663FB9),
               Color(0xff43297A),
               Color(0XFF19093B),
