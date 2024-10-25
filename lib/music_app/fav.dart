@@ -1,7 +1,9 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:musicapp/music_app/add_to.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
+import 'package:musicapp/music_app/play.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Fav extends StatefulWidget {
@@ -144,8 +146,27 @@ class _FavState extends State<Fav> {
                       itemBuilder: (context, index) {
                         final song = _favoritesBox!.getAt(index);
                         return ListTile(
-                          onTap: () {
-                            // Navigate to play song screen
+                           onTap: () {
+                            // Create a list of MediaItems from favorites
+                            List<MediaItem> favoriteSongs = _favoritesBox!.values.map((favorite) {
+                              return MediaItem(
+                                id: favorite.uri,
+                                title: favorite.tittle,
+                                artist: favorite.artist,
+                                album: favorite.id.toString(),
+                              );
+                            }).toList();
+
+                            // Navigate to the Play screen and pass the favorite songs list and the selected index
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Play(
+                                  songs: favoriteSongs,
+                                  initialIndex: index,
+                                ),
+                              ),
+                            );
                           },
                           title: Text(
                             song?.tittle ?? "Unknown Title",
