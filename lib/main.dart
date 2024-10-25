@@ -9,7 +9,7 @@ void main() async {
 
   Hive.initFlutter();
   Hive.registerAdapter(AllSongsAdapter());
-  //await Hive.openBox<AllSongs>('favorites'); 
+    //await Hive.openBox<AllSongs>('favorites');
   runApp(const MyApp());
 }
 
