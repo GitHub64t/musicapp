@@ -258,7 +258,8 @@ class _AllSongsState extends State<All_Songs> {
                 : ListView.builder(
                     itemCount: _filteredSongs.length,
                     itemBuilder: (context, index) {
-                      var song = _filteredSongs[index];
+                       var song = _filteredSongs[index];
+                    
 
                       return ListTile(
                         title: Text(

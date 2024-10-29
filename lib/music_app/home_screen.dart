@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:musicapp/music_app/about.dart';
 import 'package:musicapp/music_app/all_songss.dart';
 import 'package:musicapp/music_app/fav.dart';
+import 'package:musicapp/music_app/hive1/creating_playlist.dart';
+import 'package:musicapp/music_app/hive1/playlist_song_screen.dart';
 import 'package:musicapp/music_app/playlist.dart';
 import 'package:musicapp/music_app/recent.dart';
 
@@ -177,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Recent()),
+                      MaterialPageRoute(builder: (context) =>CreatingPlaylist()),
                     );
                   },
                   child: Container(
@@ -276,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Playlist()),
+                      MaterialPageRoute(builder: (context) =>  CreatingPlaylist()),
                     );
                   },
                   child: Container(

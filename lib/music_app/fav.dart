@@ -144,7 +144,8 @@ class _FavState extends State<Fav> {
                   : ListView.builder(
                       itemCount: _favoritesBox!.length,
                       itemBuilder: (context, index) {
-                        final song = _favoritesBox!.getAt(index);
+                       final song = _favoritesBox!.getAt(index);
+                      
                         return ListTile(
                            onTap: () {
                             // Create a list of MediaItems from favorites
@@ -232,7 +233,7 @@ class _FavState extends State<Fav> {
                 leading: const Icon(Icons.add_rounded, color: Colors.white),
                 title: const Text('Add to playlist', style: TextStyle(color: Colors.white)),
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const AddTo()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddTo(song:song,)));
                 },
               ),
             ],
