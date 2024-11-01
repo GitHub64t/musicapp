@@ -111,9 +111,6 @@ int _parseId(dynamic id) {
   }
 }
 
-
-
-
   void _togglePlayPause() {
     setState(() {
       if (isPlaying) {

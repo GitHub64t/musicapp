@@ -1,4 +1,4 @@
-import 'dart:ui';
+
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/music_app/play.dart';
 import 'package:musicapp/services/audioplayersingleton.dart';
+import 'package:musicapp/widgets/addplaylist_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class All_Songs extends StatefulWidget {
@@ -35,6 +36,7 @@ class _AllSongsState extends State<All_Songs> {
     _searchController.addListener(() {
       _filterSongs(_searchController.text);
     });
+  
   }
 
   @override
@@ -43,6 +45,7 @@ class _AllSongsState extends State<All_Songs> {
     _audioPlayer.dispose();
     _searchController.dispose();
     super.dispose();
+
   }
 
   Future<void> fetchAndStoreSongs() async {
@@ -296,6 +299,7 @@ class _AllSongsState extends State<All_Songs> {
                               ),
                             ),
                           );
+                         
                         },
                         subtitle: Text(
                           song.artist,
@@ -318,7 +322,13 @@ class _AllSongsState extends State<All_Songs> {
                         trailing: IconButton(
                             icon: const Icon(Icons.more_vert,
                                 color: Colors.white),
-                            onPressed: () {}),
+                            onPressed: () {
+                             AddplaylistWidget.showOptionsBottomSheet(
+                              song: song,
+                              context: context,
+                              songName: song.tittle, 
+                              singerName: song.artist);
+                            }),
                       );
                     },
                   ),

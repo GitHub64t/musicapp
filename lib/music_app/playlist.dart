@@ -1,16 +1,37 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/add_to.dart';
+import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/music_app/home_screen.dart';
+import 'package:musicapp/music_app/play.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 
 class Playlist extends StatefulWidget {
-  const Playlist({super.key});
+  final String playlistName;
+  const Playlist({super.key,required this.playlistName});
 
   @override
   State<Playlist> createState() => _PlaylistState();
 }
 
 class _PlaylistState extends State<Playlist> {
+
+   List<AllSongs> playlistSongs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSongs();
+  }
+
+  Future<void> _loadSongs() async {
+    final playlistBox = await Hive.openBox<AllSongs>(widget.playlistName);
+    setState(() {
+      playlistSongs = playlistBox.values.toList();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,9 +40,15 @@ class _PlaylistState extends State<Playlist> {
         Container(
           decoration: const BoxDecoration(
               gradient: LinearGradient(
-                  colors: [Color(0xff6A42BF), Color(0xff271748), Colors.black],
-                  end: Alignment.bottomCenter,
-                  begin: Alignment.topCenter)),
+                  colors: [
+                   Color(0xff704BBE),
+          Color(0xff43297A),
+          Color(0xff19093B),
+           Colors.black
+                      ],
+                 end: Alignment.bottomCenter,
+                begin: Alignment.topCenter,
+                 )),
           child: Column(children: [
             const SizedBox(
               height: 60,
@@ -52,7 +79,7 @@ class _PlaylistState extends State<Playlist> {
               ],
             ),
             const SizedBox(
-              height: 20,
+              height: 50,
             ),
             Container(
               decoration: const BoxDecoration(
@@ -61,7 +88,10 @@ class _PlaylistState extends State<Playlist> {
                     Color.fromARGB(255, 91, 55, 168),
                     Color(0xff351F64),
                     Color(0xff1E0D43)
-                  ], end: Alignment.bottomCenter, begin: Alignment.topCenter)),
+                  ], 
+                  end: Alignment.bottomCenter,
+                   begin: Alignment.topCenter
+                   )),
               height: 120,
               width: 370,
               child: Row(
@@ -86,20 +116,20 @@ class _PlaylistState extends State<Playlist> {
                   const SizedBox(
                     width: 15,
                   ),
-                  const Column(
+                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Playlist 1 ",
-                        style: TextStyle(
+                      Text(widget.playlistName
+                        ,
+                        style:const TextStyle(
                             color: Colors.white,
                             decoration: TextDecoration.none,
                             fontSize: 20,
                             fontWeight: FontWeight.w500),
                       ),
-                      Text("Songs 11   ",
-                          style: TextStyle(
+                      Text(  "songs ${playlistSongs.length.toString()}",
+                          style:const TextStyle(
                               color: Colors.white,
                               decoration: TextDecoration.none,
                               fontSize: 12,
@@ -127,42 +157,81 @@ class _PlaylistState extends State<Playlist> {
               ),
             ),
             const SizedBox(
-              height: 30,
+              height: 10,
             ),
           ]),
         ),
         Expanded(
-            child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-        return ListTile(
-          onTap: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) =>const Play()),
-            // );
-          },
-          title:const Text(
-            "song name",
-            style: TextStyle(color: Colors.white),
-          ),
-          subtitle:
-            const  Text("Unknown Artist", style: TextStyle(color: Colors.white)),
-          leading:const Icon(
-            Icons.music_note,
-            color: Colors.white,
-          ),
-          trailing: IconButton(
-            icon:const Icon(
-              Icons.more_vert,
-              color: Colors.white,
-            ),
-            onPressed: () => _showOptionsBottomSheet(context),
-          ),
-        );
-                  },
-                ))
-      ]),
+          child: playlistSongs.isEmpty
+          ? const Center(
+              child: Text(
+                "No Songs Added",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              itemCount: playlistSongs.length,
+              itemBuilder: (context, index) {
+                final song = playlistSongs[index];
+                return  ListTile(
+                          //  onTap: () {
+                          //   // Create a list of MediaItems from favorites
+                          //   List<MediaItem> favoriteSongs = _favoritesBox!.values.map((favorite) {
+                          //     return MediaItem(
+                          //       id: favorite.uri,
+                          //       title: favorite.tittle,
+                          //       artist: favorite.artist,
+                          //       album: favorite.id.toString(),
+                          //     );
+                          //   }).toList();
+
+                          //   // Navigate to the Play screen and pass the favorite songs list and the selected index
+                          //   Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) => Play(
+                          //         songs: favoriteSongs,
+                          //         initialIndex: index,
+                          //       ),
+                          //     ),
+                          //   );
+                          // },
+                          title: Text(
+                            song.tittle ,
+                            style: const TextStyle(color: Colors.white),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            song.artist ,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          leading: QueryArtworkWidget(
+                            id: song.id,
+                            type: ArtworkType.AUDIO,
+                            artworkHeight: 40,
+                            artworkWidth: 40,
+                            artworkFit: BoxFit.cover,
+                            nullArtworkWidget: const CircleAvatar(
+                              backgroundColor: Color.fromARGB(255, 46, 19, 86),
+                              child: Icon(
+                                Icons.music_note,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.more_vert, color: Colors.white),
+                            onPressed:(){}
+                           // _showOptionsBottomSheet(context, , index),
+                          ),
+                        );
+              },
+            ), 
+ 
+                )
+      ]
+      ),
     );
   }
   void _showOptionsBottomSheet(BuildContext context) {

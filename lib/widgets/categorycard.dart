@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:musicapp/music_app/hive1/creating_playlist.dart';
+
 import 'package:musicapp/music_app/hive1/playlist_song_screen.dart';
 import 'package:musicapp/music_app/playlist.dart';
+
 
 class CategoryCard extends StatelessWidget {
   final String imageUrl;
@@ -19,7 +20,7 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> PlaylistSongsScreen(playlistName: playlist) ));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> Playlist(playlistName: playlist)));
       },
       child: Container(
         width: 100,

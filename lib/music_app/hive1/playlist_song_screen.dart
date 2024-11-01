@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
-import 'package:musicapp/widgets/categorycard.dart';
 
 class PlaylistSongsScreen extends StatefulWidget {
   final String playlistName;
@@ -47,24 +46,9 @@ class _PlaylistSongsScreenState extends State<PlaylistSongsScreen> {
               itemBuilder: (context, index) {
                 final song = playlistSongs[index];
                 return ListTile(
- title: Text(playlistSongs[index].tittle),
- subtitle: Text(playlistSongs[index].artist),
+                  title: Text(song.tittle),
+                  subtitle: Text(playlistSongs[index].artist),
                 );
-            
-              //  child: ListView.builder(itemBuilder: itemBuilder),
-               
-           
-                // return ListTile(
-                //   title: Text(
-                //     song.tittle,
-                //     style: const TextStyle(color: Colors.white),
-                //   ),
-                //   subtitle: Text(
-                //     song.artist ?? "Unknown Artist",
-                //     style: const TextStyle(color: Colors.white70),
-                //   ),
-                //   leading: Icon(Icons.music_note, color: Colors.white),
-                // );
               },
             ),
     );

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:musicapp/music_app/add_to.dart';
+import 'package:musicapp/music_app/hive1/all_songs.dart';
 
 class AddplaylistWidget {
-
- void _showOptionsBottomSheet(BuildContext context) {
+  static void showOptionsBottomSheet({
+    required AllSongs? song,
+    required BuildContext context,
+    required String songName,
+    required String singerName,
+  }) {
     showModalBottomSheet(
       backgroundColor: const Color.fromARGB(255, 33, 32, 32),
       context: context,
@@ -13,24 +18,25 @@ class AddplaylistWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const ListTile(
+              ListTile(
                 title: Text(
-                  'song name',
-                  style: TextStyle(color: Colors.white),
+                  songName,
+                  style: const TextStyle(color: Colors.white),
                 ),
-                leading: Icon(
+                leading: const Icon(
                   Icons.music_note,
                   color: Colors.white,
                 ),
                 subtitle: Text(
-                  "singername",
-                  style: TextStyle(
+                  singerName,
+                  style: const TextStyle(
                     color: Colors.white70,
                   ),
                 ),
               ),
               const Divider(
                 thickness: 0.4,
+                color: Colors.white70,
               ),
               ListTile(
                 leading: const Icon(
@@ -43,13 +49,13 @@ class AddplaylistWidget {
                 ),
                 onTap: () {
                   Navigator.of(context).pop();
-                  // Handle Option 2 action
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text(
-                      'Remove from this playlist',
-                      style: TextStyle(color: Colors.white),
-                    )),
+                      content: Text(
+                        'Removed from playlist',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   );
                 },
               ),
@@ -59,16 +65,14 @@ class AddplaylistWidget {
                   color: Colors.white,
                 ),
                 title: const Text(
-                  'add to playlist',
+                  'Add to playlist',
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const AddTo()));
-                  // Handle Option 3 action
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(content: Text('')),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddTo(song: song,)),
+                  );
                 },
               ),
             ],
@@ -77,4 +81,7 @@ class AddplaylistWidget {
       },
     );
   }
+
+
 }
+

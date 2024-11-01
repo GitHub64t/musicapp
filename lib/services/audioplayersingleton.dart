@@ -1,11 +1,14 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:musicapp/music_app/hive1/all_songs.dart';
 
 class AudioPlayerSingleton {
   List<MediaItem> playlistList = [];
   int currentIndex = 0;
+  Box<AllSongs>? recentlyPlayedBox;
 
   // Private constructor for Singleton pattern
   AudioPlayerSingleton._privateConstructor();
@@ -36,6 +39,116 @@ class AudioPlayerSingleton {
     await playSong(playlist[index]); // Play the song at the given index
   }
 
+  Future<void> openRecentlyPlayedBox() async {
+    recentlyPlayedBox = await Hive.openBox<AllSongs>('recentlyPlayed');
+  }
+
+Future<void> addRecentlyPlayed(MediaItem song) async {
+  if (recentlyPlayedBox == null) {
+    await openRecentlyPlayedBox();
+  }
+
+  // Check if the song is already in the recently played list
+  int existingIndex = recentlyPlayedBox!.values.toList().indexWhere((item) => item.uri == song.id);
+  
+  // Remove the song if it already exists to avoid duplicates
+  if (existingIndex != -1) {
+    await recentlyPlayedBox!.deleteAt(existingIndex);
+  }
+
+  // Create a new song entry
+  AllSongs newPlayed = AllSongs(
+    id: int.parse(song.album.toString()),
+    tittle: song.title,
+    artist: song.artist ?? 'Unknown',
+    uri: song.id,
+  );
+
+  // Add the new song at the end of the list
+  await recentlyPlayedBox!.add(newPlayed);
+
+  // Check the length and remove the first song if it exceeds the limit of 10
+  if (recentlyPlayedBox!.length > 10) {
+    await recentlyPlayedBox!.deleteAt(0);
+  }
+}
+
+
+
+  //   Future<void> addRecentlyPlayed(MediaItem song) async {
+  //   if (recentlyPlayedBox == null) {
+  //     await openRecentlyPlayedBox();
+      
+  //   }
+    
+
+  //   // Check if the song is already in the recently played list
+  //   bool exists = recentlyPlayedBox!.values.any((item) => item.uri == song.id);
+  //   if (!exists) {
+  //    AllSongs newPlayed =AllSongs(
+  //       id: int.parse(song.album.toString()),
+  //       tittle: song.title,
+  //       artist: song.artist ?? 'Unknown',
+  //       uri: song.id,
+  //     );
+
+  //     // Add the new song at the beginning of the list
+  //     await recentlyPlayedBox!.put(0, newPlayed); // This adds to the top
+
+  //     // Move existing items down (shift them)
+  //     List<AllSongs> existingSongs = recentlyPlayedBox!.values.toList();
+  //     for (int i = 0; i < existingSongs.length; i++) {
+  //        if(existingSongs.length > 7){
+  //            await recentlyPlayedBox!.deleteAt(existingSongs.length);
+  //         await recentlyPlayedBox!.put(i, existingSongs[i]);
+  //         print("working");
+  //         }else{
+  //            print("dddddd");
+          
+  //            await recentlyPlayedBox!.put(i, existingSongs[i]);
+  //         }
+  //     }
+
+  //     // Remove the old key if necessary
+  //     // if (existingSongs.length > 7) { // Limit the size of the list if needed
+        
+  //     //   await recentlyPlayedBox!.deleteAt(existingSongs.length);
+        
+  //     // }
+  //   }
+  // }
+
+  // Future<void> addRecentlyPlayed(MediaItem song) async {
+  //   if (recentlyPlayedBox == null) {
+  //     await openRecentlyPlayedBox();
+  //   }
+
+  //   // Check if the song is already in the recently played list
+  //   bool exists = recentlyPlayedBox!.values.any((item) => item.uri == song.id);
+  //   if (!exists) {
+  //     AllSongs newPlayed = AllSongs(
+  //       id: int.parse(song.album.toString()),
+  //       tittle: song.title,
+  //       artist: song.artist ?? 'Unknown',
+  //       uri: song.id,
+  //     );
+
+  //     // Add the new song at the beginning of the list
+  //     await recentlyPlayedBox!.put(0, newPlayed); // This adds to the top
+
+  //     // Move existing items down (shift them)
+  //     List<AllSongs> existingSongs = recentlyPlayedBox!.values.toList();
+  //     for (int i = 0; i < existingSongs.length; i++) {
+  //       await recentlyPlayedBox!.put(i, existingSongs[i]);
+  //     }
+
+  //     // Remove the old key if necessary
+  //     if (existingSongs.length >= 10) { // Limit the size of the list if needed
+  //       await recentlyPlayedBox!.deleteAt(existingSongs.length);
+  //     }
+  //   }
+  // }
+
   // Set the playlist
   void setPlaylist(List<MediaItem> songs , int index ) {
     playlistList = songs;
@@ -57,7 +170,9 @@ class AudioPlayerSingleton {
         _currentSong = song;
         await _audioPlayer.seek(Duration.zero, index: currentIndex); // Seek to the start of the song
         await _audioPlayer.play(); // Play the current song
+         await addRecentlyPlayed(song); 
         print("Now Playing: ${_currentSong?.id}");
+        
       } else {
         print("Song not found in the playlist.");
       }
@@ -145,22 +260,22 @@ class AudioPlayerSingleton {
 //   await _audioPlayer.play();
 // }
 
-//   // Future<void> setAudio(List<MediaItem> playlist, int index) async {
-//   //   // Load the playlist into the audio player
-//   //   try {
-//   //     // Create a ConcatenatingAudioSource from the playlist
-//   //     final playlistSource = ConcatenatingAudioSource(
-//   //       children: playlist.map((item) => AudioSource.uri(Uri.parse(item.artUri.toString()))).toList(),
-//   //     );
+  // Future<void> setAudio(List<MediaItem> playlist, int index) async {
+  //   // Load the playlist into the audio player
+  //   try {
+  //     // Create a ConcatenatingAudioSource from the playlist
+  //     final playlistSource = ConcatenatingAudioSource(
+  //       children: playlist.map((item) => AudioSource.uri(Uri.parse(item.artUri.toString()))).toList(),
+  //     );
 
-//   //     // Set the audio source
-//   //     await _audioPlayer.setAudioSource(playlistSource, initialIndex: index);
-//   //     // Play the audio
-//   //     _audioPlayer.play();
-//   //   } catch (e) {
-//   //     print("Error setting audio: $e");
-//   //   }
-//   // }
+  //     // Set the audio source
+  //     await _audioPlayer.setAudioSource(playlistSource, initialIndex: index);
+  //     // Play the audio
+  //     _audioPlayer.play();
+  //   } catch (e) {
+  //     print("Error setting audio: $e");
+  //   }
+  // }
 
 //   // Load playlist
 //   void setPlaylist(List<MediaItem> songs, {int initialIndex = 0}) {

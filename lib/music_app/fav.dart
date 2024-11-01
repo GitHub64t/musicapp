@@ -157,7 +157,6 @@ class _FavState extends State<Fav> {
                                 album: favorite.id.toString(),
                               );
                             }).toList();
-
                             // Navigate to the Play screen and pass the favorite songs list and the selected index
                             Navigator.push(
                               context,
