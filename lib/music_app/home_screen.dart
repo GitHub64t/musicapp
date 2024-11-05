@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 15,
                         ),
                         const Text(
-                          "All Songs",
+                          "Mostly Played",
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ],
