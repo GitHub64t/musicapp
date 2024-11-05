@@ -22,6 +22,13 @@ class CategoryCard extends StatelessWidget {
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context)=> Playlist(playlistName: playlist)));
       },
+      onLongPress: () =>     ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Removed from favorites')),
+    ),
+       
+    
+
+      
       child: Container(
         width: 100,
         

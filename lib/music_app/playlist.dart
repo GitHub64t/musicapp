@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/add_to.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
-import 'package:musicapp/music_app/home_screen.dart';
+import 'package:musicapp/music_app/hive1/creating_playlist.dart';
+
 import 'package:musicapp/music_app/play.dart';
+import 'package:musicapp/music_app/playlist_listscreen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 
 class Playlist extends StatefulWidget {
-  final String playlistName;
-  const Playlist({super.key,required this.playlistName});
+    String playlistName;
+   Playlist({super.key,required this.playlistName});
 
   @override
   State<Playlist> createState() => _PlaylistState();
@@ -18,11 +20,12 @@ class Playlist extends StatefulWidget {
 
 class _PlaylistState extends State<Playlist> {
 
-   List<AllSongs> playlistSongs = [];
+   List<AllSongs>? playlistSongs;
 
   @override
   void initState() {
     super.initState();
+    
     _loadSongs();
   }
 
@@ -58,10 +61,16 @@ class _PlaylistState extends State<Playlist> {
               children: [
                 IconButton(
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>const HomeScreen()));
+                     
+                   Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) =>const PlaylistListscreen(
+    
+    ),
+  ),
+);
+                    
                     },
                     icon: const Icon(
                       Icons.arrow_back,
@@ -128,7 +137,7 @@ class _PlaylistState extends State<Playlist> {
                             fontSize: 20,
                             fontWeight: FontWeight.w500),
                       ),
-                      Text(  "songs ${playlistSongs.length.toString()}",
+                      Text(  "songs ${playlistSongs!.length.toString()}",
                           style:const TextStyle(
                               color: Colors.white,
                               decoration: TextDecoration.none,
@@ -143,11 +152,12 @@ class _PlaylistState extends State<Playlist> {
                         width: 70,
                       ),
                       IconButton(
-                          onPressed: _edit,
+                          onPressed:_edit,
                           icon: const Icon(
                             Icons.edit,
                             color: Colors.white,
                           )),
+                          IconButton(onPressed: (){}, icon: Icon(Icons.delete)),
                       const SizedBox(
                         width: 20,
                       )
@@ -162,7 +172,7 @@ class _PlaylistState extends State<Playlist> {
           ]),
         ),
         Expanded(
-          child: playlistSongs.isEmpty
+          child: playlistSongs!.isEmpty
           ? const Center(
               child: Text(
                 "No Songs Added",
@@ -170,32 +180,32 @@ class _PlaylistState extends State<Playlist> {
               ),
             )
           : ListView.builder(
-              itemCount: playlistSongs.length,
+              itemCount: playlistSongs?.length,
               itemBuilder: (context, index) {
-                final song = playlistSongs[index];
+                final song = playlistSongs![index];
                 return  ListTile(
-                          //  onTap: () {
-                          //   // Create a list of MediaItems from favorites
-                          //   List<MediaItem> favoriteSongs = _favoritesBox!.values.map((favorite) {
-                          //     return MediaItem(
-                          //       id: favorite.uri,
-                          //       title: favorite.tittle,
-                          //       artist: favorite.artist,
-                          //       album: favorite.id.toString(),
-                          //     );
-                          //   }).toList();
+                           onTap: () {
+                            // Create a list of MediaItems from favorites
+                            List<MediaItem> favoriteSongs = playlistSongs!.map((favorite) {
+                              return MediaItem(
+                                id: favorite.uri,
+                                title: favorite.tittle,
+                                artist: favorite.artist,
+                                album: favorite.id.toString(),
+                              );
+                            }).toList();
 
-                          //   // Navigate to the Play screen and pass the favorite songs list and the selected index
-                          //   Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => Play(
-                          //         songs: favoriteSongs,
-                          //         initialIndex: index,
-                          //       ),
-                          //     ),
-                          //   );
-                          // },
+                            // Navigate to the Play screen and pass the favorite songs list and the selected index
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Play(
+                                  songs: favoriteSongs,
+                                  initialIndex: index,
+                                ),
+                              ),
+                            );
+                          },
                           title: Text(
                             song.tittle ,
                             style: const TextStyle(color: Colors.white),
@@ -282,37 +292,62 @@ class _PlaylistState extends State<Playlist> {
       },
     );
   }
-   void _edit() {
-   // TextEditingController nameController = TextEditingController(text: name);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Change Name'),
-          content: TextField(
-          //  controller: nameController,
-            decoration: InputDecoration(hintText: "Enter new name"),
+void _edit() {
+  String newPlaylistName = widget.playlistName;
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Edit Playlist Name'),
+        content: TextField(
+          onChanged: (value) {
+            newPlaylistName = value;
+          },
+          decoration: const InputDecoration(
+            hintText: 'Enter new playlist name',
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog without saving
-              },
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // setState(() {
-                //   name = nameController.text; // Save the new name
-                // });
-                Navigator.pop(context); // Close the dialog after saving
-              },
-              child: Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: const Text('Save'),
+            onPressed: () async {
+              if (newPlaylistName.isNotEmpty && newPlaylistName != widget.playlistName) {
+                final playlistNamesBox = await Hive.openBox<String>('playlistNames');
+                final index = playlistNamesBox.values.toList().indexOf(widget.playlistName);
+                
+                if (index != -1) {
+                  // Update playlist name in playlistNames box
+                  await playlistNamesBox.putAt(index, newPlaylistName);
+
+                  // Rename playlist box
+                  final oldBox = await Hive.openBox<AllSongs>(widget.playlistName);
+                  final newBox = await Hive.openBox<AllSongs>(newPlaylistName);
+
+                  // Copy songs to new box
+                  await newBox.addAll(oldBox.values);
+
+                  // Delete the old box
+                  await oldBox.deleteFromDisk();
+
+                  setState(() {
+                    widget.playlistName = newPlaylistName;
+                    playlistSongs = newBox.values.toList();
+                  });
+                }
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 }

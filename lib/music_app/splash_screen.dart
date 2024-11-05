@@ -34,12 +34,6 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Center(child:Image.asset("assets/images/Black_and_White_Flat_Illustrative_Music_Studio_Logo-removebg-preview.png"),
         // Text("ECHOSYNC",style: TextStyle(color: Colors.white,decoration: TextDecoration.none),)
         ),
-        // child: Column(
-        //   children: [
-        //     Icon(Icons.music_note,size: 100,color: Colors.white,),
-        //     Text("ECHOSYNC")
-        //   ],
-        // ),
       ),
     );
   }
