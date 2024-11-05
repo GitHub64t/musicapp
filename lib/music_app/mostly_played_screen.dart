@@ -1,4 +1,3 @@
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -18,19 +17,19 @@ class MostlyPlayedScreen extends StatefulWidget {
 class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
   Box<AllSongs>? mostlyPlayedBox;
 
-    @override
+  @override
   void initState() {
     super.initState();
-   //loadMostlyPlayedSongs();
+    loadMostlyPlayedSongs();
   }
   //  Future<List<AllSongs>> _fetchMostlyPlayedSongs() async {
   //  // return AudioPlayerSingleton().getMostlyPlayed();
   // }
-  // Future<void> loadMostlyPlayedSongs() async {
-  //   mostlyPlayedBox = await Hive.openBox<AllSongs>('mostlyPlayed');
-  //  mostlyPlayedBox= await AudioPlayerSingleton().getMostlyPlayed();
-  //   setState(() {}); // Refresh the UI after loading
-  // }
+  Future<void> loadMostlyPlayedSongs() async {
+    mostlyPlayedBox = await Hive.openBox<AllSongs>('mostlyPlayed');
+
+    setState(() {}); // Refresh the UI after loading
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,10 +77,10 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
                     decoration: const BoxDecoration(
                         gradient: LinearGradient(
                             colors: [
-                              Color.fromARGB(255, 91, 55, 168),
-                              Color(0xff351F64),
-                              Color(0xff1E0D43)
-                            ],
+                          Color.fromARGB(255, 91, 55, 168),
+                          Color(0xff351F64),
+                          Color(0xff1E0D43)
+                        ],
                             end: Alignment.bottomCenter,
                             begin: Alignment.topCenter)),
                     child: const Center(
@@ -120,77 +119,72 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
           ]),
         ),
         Expanded(
-          child:
-           mostlyPlayedBox == null|| mostlyPlayedBox!.isEmpty
-               ? const Center(child: Text('No mostly played songs available'))
-              
-           
-                : ListView.builder(
-                    itemCount: mostlyPlayedBox!.length,
-                    itemBuilder: (context, index) {
-                    
-                     final song = mostlyPlayedBox!.values;
-                     
-                      return ListTile(
-                        title: Text(
-                         'Played this song  "time" : "times"}' ,
-                          style: const TextStyle(color: Colors.white),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        onTap: () {
-                          List<MediaItem> recentlyPlayed = mostlyPlayedBox!.values.map((recent) {
-                            return MediaItem(
-                              id: recent.uri,
-                              title: recent.tittle,
-                              artist: recent.artist,
-                              album: recent.id.toString(),
-                            );
-                          }).toList();
-                          
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Play(
-                                songs: recentlyPlayed,
-                                initialIndex: index,
+  child: mostlyPlayedBox == null || mostlyPlayedBox!.isEmpty
+      ? const Center(child: Text('No mostly played songs available', style: TextStyle(color: Colors.white)))
+      : ListView.builder(
+          itemCount: 10,
+          itemBuilder: (context, index) {
+             final songs = mostlyPlayedBox!.values
+                        .toList()
+                        ..sort((a, b) => (b.playCount ?? 0)
+                            .compareTo(a.playCount ?? 0));
+            final song = songs[index];
+            return ListTile(
+              title: Text(
+                'Played this song ${song.playCount} ${song.playCount == 1 ? "time" : "times"}',
+                style: const TextStyle(color: Colors.white),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () {
+                List<MediaItem> recentlyPlayed = mostlyPlayedBox!.values.map((recent) {
+                  return MediaItem(
+                    id: recent.uri,
+                    title: recent.tittle,
+                    artist: recent.artist,
+                    album: recent.id.toString(),
+                  );
+                }).toList();
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Play(
+                      songs: recentlyPlayed,
+                      initialIndex: index,
+                    ),
+                  ),
+                );
+              },
+              subtitle: Text(
+                song.tittle,
+                style: const TextStyle(color: Colors.white60),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              leading:QueryArtworkWidget(
+                            id: song.id,
+                            type: ArtworkType.AUDIO,
+                            artworkHeight: 40,
+                            artworkWidth: 40,
+                            artworkFit: BoxFit.cover,
+                            nullArtworkWidget: const CircleAvatar(
+                              backgroundColor: Color.fromARGB(255, 46, 19, 86),
+                              child: Icon(
+                                Icons.music_note,
+                                color: Colors.white,
                               ),
                             ),
-                          );
-                        },
-                        subtitle: Text("",
-                         // song.tittle ,
-                          style: const TextStyle(color:Colors.white60),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        // leading: QueryArtworkWidget(
-                        //   id:song.id,
-                        //   type: ArtworkType.AUDIO,
-                        //   artworkHeight: 40,
-                        //   artworkWidth: 40,
-                        //   artworkFit: BoxFit.cover,
-                        //   nullArtworkWidget: const CircleAvatar(
-                        //     backgroundColor: Color.fromARGB(255, 46, 19, 86),
-                        //     child: Icon(
-                        //       Icons.music_note,
-                        //       color: Colors.white,
-                        //     ),
-                        //   ),
-                        // ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.more_vert, color: Colors.white),
-                           onPressed: () {}
-                          //   _showOptionsBottomSheet(context, song);
-                          // },
-                        ),
-                      );
-                    },
-                  ),
-        
-              
-  
-        )
+                          ), 
+              trailing: IconButton(
+                icon: const Icon(Icons.more_vert, color: Colors.white),
+                onPressed: () {},
+              ),
+            );
+          },
+        ),
+)
+
       ]),
     );
   }

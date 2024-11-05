@@ -16,8 +16,8 @@ class AllSongs {
   @HiveField(3)
   final String uri;
 
-  // @HiveField(4)
-  // int? playCount;
+  @HiveField(4)
+  int? playCount;
   
-  AllSongs({required this.id, required this.tittle, required this.artist,required this.uri});
+  AllSongs({required this.id, required this.tittle, required this.artist,required this.uri,this.playCount});
 }
