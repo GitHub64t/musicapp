@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/add_to.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/music_app/play.dart';
+import 'package:musicapp/widgets/miniplayer.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Recent extends StatefulWidget {
@@ -178,7 +179,11 @@ class _RecentState extends State<Recent> {
                     );
                   },
                 ),
-        )
+        ),
+             const Align(
+          alignment: Alignment.bottomCenter,
+          child: MiniPlayer(),
+        ),
       ]),
     );
   }
@@ -227,6 +232,7 @@ class _RecentState extends State<Recent> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const AddTo()));
                 },
               ),
+              
             ],
           ),
         );

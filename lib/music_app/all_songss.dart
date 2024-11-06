@@ -8,6 +8,7 @@ import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/music_app/play.dart';
 import 'package:musicapp/services/audioplayersingleton.dart';
 import 'package:musicapp/widgets/addplaylist_widget.dart';
+import 'package:musicapp/widgets/miniplayer.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class All_Songs extends StatefulWidget {
@@ -247,6 +248,8 @@ class _AllSongsState extends State<All_Songs> {
             ),
           ),
           Expanded(
+            
+
             child: _filteredSongs.isEmpty && _searchController.text.isNotEmpty
                 ? const Center(
                     child: Text(
@@ -259,6 +262,7 @@ class _AllSongsState extends State<All_Songs> {
                     ),
                   )
                 : ListView.builder(
+                  
                     itemCount: _filteredSongs.length,
                     itemBuilder: (context, index) {
                        var song = _filteredSongs[index];
@@ -332,7 +336,12 @@ class _AllSongsState extends State<All_Songs> {
                       );
                     },
                   ),
+                  
           ),
+          const Align(
+          alignment: Alignment.bottomCenter,
+          child: MiniPlayer(),
+        ),
         ],
       ),
     );

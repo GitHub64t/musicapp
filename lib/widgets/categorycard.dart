@@ -1,37 +1,33 @@
 import 'package:flutter/material.dart';
 
-import 'package:musicapp/music_app/hive1/playlist_song_screen.dart';
 import 'package:musicapp/music_app/playlist.dart';
-
 
 class CategoryCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String subtitle;
   final String playlist;
-  const CategoryCard({super.key, 
-    required this.imageUrl,
-    required this.title,
-    required this.subtitle,
-    required this.playlist
-  });
+  const CategoryCard(
+      {super.key,
+      required this.imageUrl,
+      required this.title,
+      required this.subtitle,
+      required this.playlist});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> Playlist(playlistName: playlist)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Playlist(playlistName: playlist)));
       },
-      onLongPress: () =>     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Removed from favorites')),
-    ),
-       
-    
-
-      
+      onLongPress: () => ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Removed from favorites')),
+      ),
       child: Container(
         width: 100,
-        
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -57,14 +53,15 @@ class CategoryCard extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                    color: Color.fromARGB(255, 255, 255, 255), fontWeight: FontWeight.bold,fontSize: 30),
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30),
               ),
-              Text(subtitle,
-              style:const TextStyle(
-                color: Color.fromARGB(221, 200, 200, 200),fontSize: 16
-              ) ,
+              Text(
+                subtitle,
+                style: const TextStyle(
+                    color: Color.fromARGB(221, 200, 200, 200), fontSize: 16),
               )
-
             ],
           ),
         ),

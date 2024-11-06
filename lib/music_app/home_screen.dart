@@ -6,6 +6,7 @@ import 'package:musicapp/music_app/hive1/creating_playlist.dart';
 import 'package:musicapp/music_app/mostly_played_screen.dart';
 import 'package:musicapp/music_app/playlist_listscreen.dart';
 import 'package:musicapp/music_app/recent.dart';
+import 'package:musicapp/widgets/miniplayer.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -257,6 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 15,
                 ),
                 GestureDetector(
+                  
                   onTap: () {
                     Navigator.push(
                       context,
@@ -305,11 +307,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           
             SizedBox(
-                height: 200,
-                width: 200,
+                height: 150,
+                width: 150,
                 child: Image.asset(
-                    "assets/images/Black_and_White_Flat_Illustrative_Music_Studio_Logo-removebg-preview.png",))
-          ],
+                    "assets/images/Black_and_White_Flat_Illustrative_Music_Studio_Logo-removebg-preview.png",)),
+         
+              const Align(
+          alignment: Alignment.bottomCenter,
+          child: MiniPlayer(),
+        ), ],
         ),
       ),
     );

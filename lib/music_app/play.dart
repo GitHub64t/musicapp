@@ -45,7 +45,6 @@ class _PlayState extends State<Play> {
     });
 
     isPlaying = true;
-   // deletobox();
     openFavoritesBox();
   }
 //   void deletobox() async{

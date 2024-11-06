@@ -4,6 +4,7 @@ import 'package:musicapp/music_app/add_to.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/music_app/play.dart';
+import 'package:musicapp/widgets/miniplayer.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Fav extends StatefulWidget {
@@ -200,6 +201,10 @@ class _FavState extends State<Fav> {
                       },
                     ),
         ),
+             const Align(
+          alignment: Alignment.bottomCenter,
+          child: MiniPlayer(),
+        ),
       ]),
     );
   }
@@ -235,6 +240,7 @@ class _FavState extends State<Fav> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => AddTo(song:song,)));
                 },
               ),
+           
             ],
           ),
         );
