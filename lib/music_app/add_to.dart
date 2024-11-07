@@ -37,6 +37,7 @@ class _AddToState extends State<AddTo> {
     if (widget.song != null) {
       final playlistBox = await Hive.openBox<AllSongs>(playlistName);
       await playlistBox.add(widget.song!);
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Song added to $playlistName')),
       );

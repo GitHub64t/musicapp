@@ -96,63 +96,95 @@ Future<void> cleanMostlyPlayedList() async {
   }
 }
 
+Future<void> addToMostlyPlayed(MediaItem song) async {
+  if (mostlyPlayedBox == null) {
+    await openBoxes();
+  }
 
+  // Locate song in the mostly played box by matching URI
+  AllSongs? existingSong;
+  int? existingKey;
 
-  Future<void> addToMostlyPlayed(MediaItem song) async {
-    if (mostlyPlayedBox == null) {
-      await openBoxes();
-    }
-
-    // Locate song in the mostly played box by matching URI
-    int? existingKey;
-    AllSongs? songEntry;
-    
-    // Find song entry by URI
-    for (int i = 0; i < mostlyPlayedBox!.length; i++) {
-      if (mostlyPlayedBox!.getAt(i)?.uri == song.id) {
-        existingKey = i;
-        songEntry = mostlyPlayedBox!.getAt(i);
-        break;
-      }
-    }
-
-
-   // If song is not found, add it with initial play count
-    if (songEntry == null) {
-      songEntry = AllSongs(
-        id: int.parse(song.album.toString()),
-        tittle: song.title,
-        artist: song.artist ?? 'Unknown',
-        uri: song.id,
-        playCount: 1,
-      );
-      await mostlyPlayedBox!.add(songEntry);
-    } else {
-      // If found, increment play count
-      songEntry.playCount = (songEntry.playCount ?? 0) + 1;
-      await mostlyPlayedBox!.put(existingKey, songEntry); // Update with incremented play count
-    }
-
-    // Limit mostly played list to top 10 by play count
-    if (mostlyPlayedBox!.length > 10) {
-      // Sort by playCount in descending order, then keep top 10
-      List<AllSongs> sortedList = mostlyPlayedBox!.values.toList()
-        ..sort((a, b) => (b.playCount ?? 0).compareTo(a.playCount ?? 0));
-      mostlyPlayedBox!.clear();
-      for (var i = 0; i < 10 && i < sortedList.length; i++) {
-        await mostlyPlayedBox!.add(sortedList[i]);
-      }
+  // Find song entry by URI
+  for (int i = 0; i < mostlyPlayedBox!.length; i++) {
+    AllSongs? songInBox = mostlyPlayedBox!.getAt(i);
+    if (songInBox?.uri == song.id) {
+      existingSong = songInBox;
+      existingKey = i;
+      break;
     }
   }
 
-  List<AllSongs> getMostlyPlayedSongs() {
-    if (mostlyPlayedBox == null) {
-      openBoxes();
-    }
-    // Sort the songs by play count in descending order
-    return mostlyPlayedBox!.values.toList()
-      ..sort((a, b) => (b.playCount ?? 0).compareTo(a.playCount ?? 0));
+  if (existingSong == null) {
+    // If song is not found, add it with initial play count
+    AllSongs newSong = AllSongs(
+      id: int.parse(song.album.toString()),
+      tittle: song.title,
+      artist: song.artist ?? 'Unknown',
+      uri: song.id,
+      playCount: 1,
+    );
+    await mostlyPlayedBox!.add(newSong);
+    print("Added new song with initial play count: ${newSong.playCount}");
+  } else {
+    // If found, increment play count
+    existingSong.playCount = (existingSong.playCount ?? 0) + 1;
+    await mostlyPlayedBox!.put(existingKey, existingSong); // Update existing entry
+    print("Incremented play count for existing song: ${existingSong.playCount}");
   }
+}
+
+// Future<void> addToMostlyPlayed(MediaItem song) async {
+//   if (mostlyPlayedBox == null) {
+//     await openBoxes();
+//   }
+
+//   // Locate song in the mostly played box by matching URI
+//   AllSongs? existingSong;
+//   int? existingKey;
+
+//   // Find song entry by URI
+//   for (int i = 0; i < mostlyPlayedBox!.length; i++) {
+//     AllSongs? songInBox = mostlyPlayedBox!.getAt(i);
+//     if (songInBox?.uri == song.id) {
+//       existingSong = songInBox;
+//       existingKey = i;
+//       break;
+//     }
+//   }
+
+//   if (existingSong == null) {
+//     // If song is not found, add it with initial play count
+//     AllSongs newSong = AllSongs(
+//       id: int.parse(song.album.toString()),
+//       tittle: song.title,
+//       artist: song.artist ?? 'Unknown',
+//       uri: song.id,
+//       playCount: 1,
+//     );
+//     await mostlyPlayedBox!.add(newSong);
+//     print("Added new song with initial play count: ${newSong.playCount}");
+//   } else {
+//     // If found, increment play count
+//     existingSong.playCount = (existingSong.playCount ?? 0) + 1;
+//     await mostlyPlayedBox!.put(existingKey, existingSong); // Update existing entry
+//     print("Incremented play count for existing song: ${existingSong.playCount}");
+//   }
+// }
+
+
+
+List<AllSongs> getTopMostlyPlayedSongs(int count) {
+  if (mostlyPlayedBox == null) {
+    openBoxes();
+  }
+
+  // Sort the songs by play count in descending order and return only the top `count` songs
+  return mostlyPlayedBox!.values.toList()
+    ..sort((a, b) => (b.playCount ?? 0).compareTo(a.playCount ?? 0))
+    ..sublist(0, count > mostlyPlayedBox!.length ? mostlyPlayedBox!.length : count);
+}
+
 
   // Set the playlist
   void setPlaylist(List<MediaItem> songs, int index) {
@@ -165,29 +197,50 @@ Future<void> cleanMostlyPlayedList() async {
       initialIndex: currentIndex,
     );
   }
+Future<void> playSong(MediaItem song) async {
+  try {
+    currentIndex = playlistList.indexWhere((element) => element.id == song.id);
+    if (currentIndex != -1) {
+      _currentSong = song;
+      await _audioPlayer.seek(Duration.zero, index: currentIndex);
+      await _audioPlayer.play();
+      
+      // Only update play count after the song starts playing to prevent multiple increments
+      await addToMostlyPlayed(song); // This updates the play count only once
+      
+      await addRecentlyPlayed(song); // Optionally add the song to the recently played list
+      print("Now Playing: ${_currentSong?.id}");
+    } else {
+      print("Song not found in the playlist.");
+    }
+  } catch (e) {
+    print("Error playing song: $e");
+  }
+}
 
   // Play the selected song
-  Future<void> playSong(MediaItem song) async {
-    try {
-      currentIndex = playlistList.indexWhere((element) => element.id == song.id);
-      if (currentIndex != -1) {
-        _currentSong = song;
-        await _audioPlayer.seek(Duration.zero, index: currentIndex);
-        await _audioPlayer.play();
+  // Future<void> playSong(MediaItem song) async {
+  //   try {
+  //     currentIndex = playlistList.indexWhere((element) => element.id == song.id);
+  //     if (currentIndex != -1) {
+  //       _currentSong = song;
+  //       await _audioPlayer.seek(Duration.zero, index: currentIndex);
+  //       await _audioPlayer.play();
         
-        await addRecentlyPlayed(song); 
-        await addToMostlyPlayed(song);
-        print("Now Playing: ${_currentSong?.id}");
+  //       await addRecentlyPlayed(song); 
+       
+  //       await addToMostlyPlayed(song);
+  //       print("Now Playing: ${_currentSong?.id}");
         
-      } else {
-        print("Song not found in the playlist.");
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error playing song: $e");
-      }
-    }
-  }
+  //     } else {
+  //       print("Song not found in the playlist.");
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print("Error playing song: $e");
+  //     }
+  //   }
+  // }
 
   // Pause the currently playing song
   void pause() {

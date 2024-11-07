@@ -26,8 +26,6 @@ class _PlayState extends State<Play> {
   void initState() {
     super.initState();
 
-    //favBox = Hive.box<AllSongs>('favorites'); // Open the Hive box for favorites
-
     _audioPlayerSingleton.setPlaylist(widget.songs, widget.initialIndex);
     _audioPlayerSingleton.currentIndex = widget.initialIndex;
     _audioPlayerSingleton.playSong(widget.songs[widget.initialIndex]);
@@ -49,7 +47,6 @@ class _PlayState extends State<Play> {
   }
 //   void deletobox() async{
 // await Hive.deleteBoxFromDisk('favorites');
-
 //   }
 
   Future<void> openFavoritesBox() async {
@@ -93,18 +90,8 @@ void toggleFavorite(MediaItem song) async {
     );
     await favBox!.add(newFav);
   }
-  setState(() {}); // Update the UI
+  setState(() {}); 
 }
-
-// int _parseId(dynamic id) {
-//   try {
-//     return int.parse(id.toString()); // Try parsing as an integer
-//   } catch (e) {
-//     // If parsing fails, return a default value (or handle it differently)
-//     print('Invalid id format, returning 0: $e');
-//     return 0;
-//   }
-// }
 
   void _togglePlayPause() {
     setState(() {

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:musicapp/music_app/about.dart';
 import 'package:musicapp/music_app/all_songss.dart';
 import 'package:musicapp/music_app/fav.dart';
-import 'package:musicapp/music_app/hive1/creating_playlist.dart';
 import 'package:musicapp/music_app/mostly_played_screen.dart';
 import 'package:musicapp/music_app/playlist_listscreen.dart';
 import 'package:musicapp/music_app/recent.dart';
 import 'package:musicapp/widgets/miniplayer.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,29 +14,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
- 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Color(0xff704BBE),
-      //   title:Text("Home") ,
-      // ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   onTap: _onTabTapped,
-      //   // backgroundColor:Colors.black ,
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'Home',
-      //     ),
-         
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.info),
-      //       label: 'About',
-      //     ),
-      //   ],
-      // ),
       body: Container(
         decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [
@@ -52,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AppBar(
-             // centerTitle: true,
+              // centerTitle: true,
               automaticallyImplyLeading: false,
               title: const Text(
                 "  HOME",
@@ -62,44 +39,51 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.w900),
               ),
               backgroundColor: Colors.transparent,
+              actions: [
+                
+                IconButton(onPressed: (){}, icon:const Icon(Icons.settings,color: Colors.white,)),
+                const SizedBox(width: 10,),
+              ],
             ),
             const SizedBox(
               height: 10,
             ),
             GestureDetector(
-                onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const All_Songs()),
-                    );
-                  },
-              child:Container(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const All_Songs()),
+                );
+              },
+              child: Container(
                 height: 150,
                 width: 370,
                 decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 91, 55, 168),
-                              Color(0xff351F64),
-                              Color(0xff1E0D43)
-                            ],
-                            end: Alignment.bottomCenter,
-                            begin: Alignment.topCenter)),
-                            child:const Center(
-                              child: ListTile(
-                              
-                                title: Text("All Songs",style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20
-                                ),),
-                                leading: Icon(Icons.music_note,size: 60,color: Colors.white,),
-                              ),
-                            ),
-              ) ,
-              
-            ),SizedBox(
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                    gradient: LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 91, 55, 168),
+                          Color(0xff351F64),
+                          Color(0xff1E0D43)
+                        ],
+                        end: Alignment.bottomCenter,
+                        begin: Alignment.topCenter)),
+                child: const Center(
+                  child: ListTile(
+                    title: Text(
+                      "All Songs",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    leading: Icon(
+                      Icons.music_note,
+                      size: 60,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
               height: 18,
             ),
             Row(
@@ -128,12 +112,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                             end: Alignment.bottomCenter,
                             begin: Alignment.topCenter)),
-                    child: Column(
+                    child: const Column(
                       children: [
-                        Container(
+                        SizedBox(
                           width: 180,
                           height: 120,
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.music_note,
                               size: 60,
@@ -141,10 +125,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           height: 15,
                         ),
-                        const Text(
+                        Text(
                           "Mostly Played",
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
@@ -158,10 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Recent())
-                    );
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Recent()));
                   },
                   child: Container(
                     height: 180,
@@ -176,12 +159,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                             end: Alignment.bottomCenter,
                             begin: Alignment.topCenter)),
-                    child: Column(
+                    child: const Column(
                       children: [
-                        Container(
+                        SizedBox(
                           width: 180,
                           height: 120,
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.music_note,
                               size: 60,
@@ -189,10 +172,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           height: 15,
                         ),
-                        const Text(
+                        Text(
                           "Recently Played",
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
@@ -230,12 +213,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                             end: Alignment.bottomCenter,
                             begin: Alignment.topCenter)),
-                    child: Column(
+                    child: const Column(
                       children: [
-                        Container(
+                        SizedBox(
                           width: 180,
                           height: 120,
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.music_note,
                               size: 60,
@@ -243,10 +226,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           height: 15,
                         ),
-                        const Text(
+                        Text(
                           "Favorites",
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
@@ -258,12 +241,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 15,
                 ),
                 GestureDetector(
-                  
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PlaylistListscreen()),
+                          builder: (context) => const PlaylistListscreen()),
                     );
                   },
                   child: Container(
@@ -279,12 +261,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                             end: Alignment.bottomCenter,
                             begin: Alignment.topCenter)),
-                    child: Column(
+                    child: const Column(
                       children: [
-                        Container(
+                        SizedBox(
                           width: 180,
                           height: 120,
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.music_note,
                               size: 60,
@@ -292,10 +274,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           height: 15,
                         ),
-                        const Text(
+                        Text(
                           "Playlists",
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
@@ -305,17 +287,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-          
             SizedBox(
                 height: 150,
                 width: 150,
                 child: Image.asset(
-                    "assets/images/Black_and_White_Flat_Illustrative_Music_Studio_Logo-removebg-preview.png",)),
-         
-              const Align(
-          alignment: Alignment.bottomCenter,
-          child: MiniPlayer(),
-        ), ],
+                  "assets/images/Black_and_White_Flat_Illustrative_Music_Studio_Logo-removebg-preview.png",
+                )),
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: MiniPlayer(),
+            ),
+          ],
         ),
       ),
     );

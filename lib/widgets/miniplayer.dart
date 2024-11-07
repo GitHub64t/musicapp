@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:musicapp/music_app/play.dart';
@@ -14,6 +15,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
   final AudioPlayerSingleton _audioPlayerSingleton = AudioPlayerSingleton();
   bool isPlaying = false;
   MediaItem? currentSong;
+  Duration currentPosition = Duration.zero;
 
   @override
   void initState() {
@@ -34,6 +36,13 @@ class _MiniPlayerState extends State<MiniPlayer> {
         }
       });
     });
+
+    // Listen to changes in the song position
+    _audioPlayerSingleton.audioPlayer.positionStream.listen((position) {
+      setState(() {
+        currentPosition = position;
+      });
+    });
   }
 
   void _togglePlayPause() {
@@ -49,18 +58,22 @@ class _MiniPlayerState extends State<MiniPlayer> {
     return currentSong == null
         ? const SizedBox.shrink()
         : Padding(
-            padding:  EdgeInsets.only(left: 12, right: 12, bottom: 8),
-            child:GestureDetector(
-              onTap: () {
-                // Navigate to PlayScreen when mini player is tapped
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Play(
-                     songs: _audioPlayerSingleton.playlistList, // Pass the playlist
-                      initialIndex: _audioPlayerSingleton.audioPlayer.currentIndex ?? 0, 
-                    )),
-                );
-              },
+            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 6),
+            child: GestureDetector(
+            onTap: () {
+  // Pass the current song, initial index, and current position to the play screen
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Play(
+        songs: _audioPlayerSingleton.playlistList,
+        initialIndex: _audioPlayerSingleton.audioPlayer.currentIndex ?? 0,
+       
+      ),
+    ),
+  );
+},
+
               child: Container(
                 decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -96,7 +109,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                           children: [
                             // Marquee effect for the title
                             SizedBox(
-                              width: 150, // Set a fixed width
+                              width: 150,
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Text(
@@ -145,3 +158,4 @@ class _MiniPlayerState extends State<MiniPlayer> {
           );
   }
 }
+
