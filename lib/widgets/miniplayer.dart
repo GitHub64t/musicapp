@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:musicapp/music_app/play.dart';
+
 import 'package:musicapp/services/audioplayersingleton.dart';
+import 'package:musicapp/widgets/appgraient.dart';
 
 class MiniPlayer extends StatefulWidget {
   const MiniPlayer({super.key});
@@ -11,6 +11,7 @@ class MiniPlayer extends StatefulWidget {
   State<MiniPlayer> createState() => _MiniPlayerState();
 }
 
+// In the MiniPlayer widget
 class _MiniPlayerState extends State<MiniPlayer> {
   final AudioPlayerSingleton _audioPlayerSingleton = AudioPlayerSingleton();
   bool isPlaying = false;
@@ -59,103 +60,94 @@ class _MiniPlayerState extends State<MiniPlayer> {
         ? const SizedBox.shrink()
         : Padding(
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 6),
-            child: GestureDetector(
-            onTap: () {
-  // Pass the current song, initial index, and current position to the play screen
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => Play(
-        songs: _audioPlayerSingleton.playlistList,
-        initialIndex: _audioPlayerSingleton.audioPlayer.currentIndex ?? 0,
-       
-      ),
-    ),
-  );
-},
-
-              child: Container(
-                decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 62, 43, 100),
-                        Color.fromARGB(255, 53, 32, 100),
-                        Color.fromARGB(255, 37, 17, 80),
-                        Color.fromARGB(255, 23, 5, 57)
-                      ],
-                      end: Alignment.topCenter,
-                      begin: Alignment.bottomCenter,
-                    )),
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Song Info
-                    Row(
-                      children: [
-                        Container(
-                            height: 50,
-                            width: 50,
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
-                              color: Color.fromARGB(255, 0, 0, 0),
-                            ),
-                            child: const Icon(Icons.music_note,
-                                color: Colors.white)),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Marquee effect for the title
-                            SizedBox(
-                              width: 150,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Text(
-                                  currentSong?.title ?? "Unknown Title",
-                                  style: const TextStyle(color: Colors.white),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+            child: Container(
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 62, 43, 100),
+                      Color.fromARGB(255, 53, 32, 100),
+                      Color.fromARGB(255, 37, 17, 80),
+                      Color.fromARGB(255, 23, 5, 57)
+                    ],
+                    end: Alignment.topCenter,
+                    begin: Alignment.bottomCenter,
+                  )),
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                          height: 50,
+                          width: 50,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
+                          child: const Icon(Icons.music_note,
+                              color: AppGradients.whiteColor)),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 150,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Text(
+                                currentSong?.title ?? "Unknown Title",
+                                style: const TextStyle(
+                                    color: AppGradients.whiteColor),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Text(
-                              currentSong?.artist ?? "Unknown Artist",
-                              style: const TextStyle(
-                                  color: Colors.grey, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    // Control buttons
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.skip_previous,
-                              color: Colors.white),
-                          onPressed: () =>
-                              _audioPlayerSingleton.skipPrevious(context),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            isPlaying ? Icons.pause : Icons.play_arrow,
-                            color: Colors.white,
                           ),
-                          onPressed: _togglePlayPause,
+                          Text(
+                            currentSong?.artist ?? "Unknown Artist",
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.skip_previous,
+                          color: _audioPlayerSingleton.currentIndex > 0
+                              ? AppGradients.whiteColor
+                              : const Color.fromARGB(255, 116, 116, 116),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.skip_next, color: Colors.white),
-                          onPressed: () =>
-                              _audioPlayerSingleton.skipNext(context),
+                        onPressed: () =>
+                            _audioPlayerSingleton.skipPrevious(context),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: AppGradients.whiteColor,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                        onPressed: _togglePlayPause,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.skip_next,
+                          color: _audioPlayerSingleton.currentIndex <
+                                  _audioPlayerSingleton.playlistList.length - 1
+                              ? AppGradients.whiteColor
+                              : const Color.fromARGB(255, 116, 116, 116),
+                        ),
+                        onPressed: () =>
+                            _audioPlayerSingleton.skipNext(context),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           );
   }
 }
-

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:musicapp/music_app/about.dart';
 import 'package:musicapp/music_app/all_songss.dart';
 import 'package:musicapp/music_app/fav.dart';
 import 'package:musicapp/music_app/mostly_played_screen.dart';
 import 'package:musicapp/music_app/playlist_listscreen.dart';
 import 'package:musicapp/music_app/recent.dart';
+import 'package:musicapp/widgets/appgraient.dart';
 import 'package:musicapp/widgets/miniplayer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,12 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [
-          Color(0xff704BBE),
-          Color(0xff43297A),
-          Color(0xff19093B),
-          Colors.black
-        ], begin: Alignment.topLeft)),
+            gradient:AppGradients.thirdGradient
+            ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -34,14 +32,16 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text(
                 "  HOME",
                 style: TextStyle(
-                    color: Colors.white,
+                    color: AppGradients.whiteColor,
                     fontSize: 25,
                     fontWeight: FontWeight.w900),
               ),
               backgroundColor: Colors.transparent,
               actions: [
                 
-                IconButton(onPressed: (){}, icon:const Icon(Icons.settings,color: Colors.white,)),
+                IconButton(onPressed:(){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const  About()));
+                }, icon:const Icon(Icons.settings,color: AppGradients.whiteColor,)),
                 const SizedBox(width: 10,),
               ],
             ),
@@ -60,24 +60,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 370,
                 decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(30)),
-                    gradient: LinearGradient(
-                        colors: [
-                          Color.fromARGB(255, 91, 55, 168),
-                          Color(0xff351F64),
-                          Color(0xff1E0D43)
-                        ],
-                        end: Alignment.bottomCenter,
-                        begin: Alignment.topCenter)),
+                    gradient: AppGradients.secondaryGradient,
+                        ),
                 child: const Center(
                   child: ListTile(
                     title: Text(
                       "All Songs",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(color:AppGradients.whiteColor, fontSize: 20),
                     ),
                     leading: Icon(
                       Icons.music_note,
                       size: 60,
-                      color: Colors.white,
+                      color:AppGradients.whiteColor,
                     ),
                   ),
                 ),
@@ -104,14 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 180,
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(30)),
-                        gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 91, 55, 168),
-                              Color(0xff351F64),
-                              Color(0xff1E0D43)
-                            ],
-                            end: Alignment.bottomCenter,
-                            begin: Alignment.topCenter)),
+                        gradient: AppGradients.secondaryGradient,
+                            ),
                     child: const Column(
                       children: [
                         SizedBox(
@@ -121,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Icon(
                               Icons.music_note,
                               size: 60,
-                              color: Colors.white,
+                              color: AppGradients.whiteColor,
                             ),
                           ),
                         ),
@@ -130,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text(
                           "Mostly Played",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          style: TextStyle(color:AppGradients.whiteColor, fontSize: 20),
                         ),
                       ],
                     ),
@@ -151,14 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 180,
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(30)),
-                        gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 91, 55, 168),
-                              Color(0xff351F64),
-                              Color(0xff1E0D43)
-                            ],
-                            end: Alignment.bottomCenter,
-                            begin: Alignment.topCenter)),
+                        gradient: AppGradients.secondaryGradient,
+                            ),
                     child: const Column(
                       children: [
                         SizedBox(
@@ -168,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Icon(
                               Icons.music_note,
                               size: 60,
-                              color: Colors.white,
+                              color: AppGradients.whiteColor,
                             ),
                           ),
                         ),
@@ -177,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text(
                           "Recently Played",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          style: TextStyle(color: AppGradients.whiteColor, fontSize: 20),
                         ),
                       ],
                     ),
@@ -205,14 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 180,
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(30)),
-                        gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 91, 55, 168),
-                              Color(0xff351F64),
-                              Color(0xff1E0D43)
-                            ],
-                            end: Alignment.bottomCenter,
-                            begin: Alignment.topCenter)),
+                        gradient: AppGradients.secondaryGradient,
+                            ),
                     child: const Column(
                       children: [
                         SizedBox(
@@ -222,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Icon(
                               Icons.music_note,
                               size: 60,
-                              color: Colors.white,
+                              color: AppGradients.whiteColor,
                             ),
                           ),
                         ),
@@ -231,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text(
                           "Favorites",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          style: TextStyle(color: AppGradients.whiteColor, fontSize: 20),
                         ),
                       ],
                     ),
@@ -253,14 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 180,
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(30)),
-                        gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 91, 55, 168),
-                              Color(0xff351F64),
-                              Color(0xff1E0D43)
-                            ],
-                            end: Alignment.bottomCenter,
-                            begin: Alignment.topCenter)),
+                        gradient: AppGradients.secondaryGradient,),
                     child: const Column(
                       children: [
                         SizedBox(
@@ -270,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Icon(
                               Icons.music_note,
                               size: 60,
-                              color: Colors.white,
+                              color:AppGradients.whiteColor,
                             ),
                           ),
                         ),
@@ -279,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text(
                           "Playlists",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          style: TextStyle(color: AppGradients.whiteColor, fontSize: 20),
                         ),
                       ],
                     ),
@@ -287,12 +256,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
+             const SizedBox(
+                  height: 30,
+                ),
             SizedBox(
-                height: 150,
-                width: 150,
+                height: 80,
+                width: 80,
                 child: Image.asset(
-                  "assets/images/Black_and_White_Flat_Illustrative_Music_Studio_Logo-removebg-preview.png",
+                  "assets/images/logo.png",
                 )),
+                const SizedBox(
+                  height: 30,
+                ),
             const Align(
               alignment: Alignment.bottomCenter,
               child: MiniPlayer(),

@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
         radius: 1)
       ),
       child: Center(
-        child: Center(child:Image.asset("assets/images/Black_and_White_Flat_Illustrative_Music_Studio_Logo-removebg-preview.png"),
+        child: Center(child:Image.asset("assets/images/logo.png"),
         // Text("ECHOSYNC",style: TextStyle(color: Colors.white,decoration: TextDecoration.none),)
         ),
       ),

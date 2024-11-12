@@ -1,11 +1,11 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:musicapp/music_app/add_to.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
-import 'package:musicapp/music_app/play.dart';
+import 'package:musicapp/widgets/appgraient.dart';
 import 'package:musicapp/widgets/miniplayer.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:musicapp/widgets/navigation.dart';
+import 'package:musicapp/widgets/options.dart';
+import 'package:musicapp/widgets/songListtile.dart';
 
 class Fav extends StatefulWidget {
   const Fav({super.key});
@@ -36,11 +36,7 @@ class _FavState extends State<Fav> {
       body: Column(children: [
         Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xff6A42BF), Color(0xff271748), Colors.black],
-              end: Alignment.bottomCenter,
-              begin: Alignment.topCenter,
-            ),
+            gradient: AppGradients.primaryGradient,
           ),
           child: Column(children: [
             const SizedBox(height: 60),
@@ -53,14 +49,14 @@ class _FavState extends State<Fav> {
                   },
                   icon: const Icon(
                     Icons.arrow_back,
-                    color: Colors.white,
+                    color: AppGradients.whiteColor,
                   ),
                 ),
                 const Text(
                   "Favorites",
                   style: TextStyle(
                     fontSize: 20,
-                    color: Colors.white,
+                    color: AppGradients.whiteColor,
                     fontWeight: FontWeight.w800,
                     decoration: TextDecoration.none,
                   ),
@@ -81,20 +77,12 @@ class _FavState extends State<Fav> {
                     height: 100,
                     width: 100,
                     decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color.fromARGB(255, 91, 55, 168),
-                          Color(0xff351F64),
-                          Color(0xff1E0D43),
-                        ],
-                        end: Alignment.bottomCenter,
-                        begin: Alignment.topCenter,
-                      ),
+                      gradient: AppGradients.secondaryGradient,
                     ),
                     child: const Center(
                       child: Icon(
                         Icons.favorite_border_outlined,
-                        color: Colors.white,
+                        color: AppGradients.whiteColor,
                         size: 40,
                       ),
                     ),
@@ -107,7 +95,7 @@ class _FavState extends State<Fav> {
                       Text(
                         "Favorites",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppGradients.whiteColor,
                           decoration: TextDecoration.none,
                           fontWeight: FontWeight.normal,
                           fontSize: 35,
@@ -116,7 +104,7 @@ class _FavState extends State<Fav> {
                       Text(
                         "Playlist",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppGradients.whiteColor,
                           decoration: TextDecoration.none,
                           fontSize: 20,
                           fontWeight: FontWeight.w200,
@@ -139,121 +127,98 @@ class _FavState extends State<Fav> {
                   ? const Center(
                       child: Text(
                         "No Favorites Added",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        style: TextStyle(
+                            color: AppGradients.whiteColor, fontSize: 20),
                       ),
                     )
                   : ListView.builder(
+                      padding: EdgeInsets.zero,
                       itemCount: _favoritesBox!.length,
                       itemBuilder: (context, index) {
-                       final song = _favoritesBox!.getAt(index);
-                      
-                        return ListTile(
-                           onTap: () {
-                            // Create a list of MediaItems from favorites
-                            List<MediaItem> favoriteSongs = _favoritesBox!.values.map((favorite) {
-                              return MediaItem(
-                                id: favorite.uri,
-                                title: favorite.tittle,
-                                artist: favorite.artist,
-                                album: favorite.id.toString(),
-                              );
-                            }).toList();
-                            // Navigate to the Play screen and pass the favorite songs list and the selected index
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Play(
-                                  songs: favoriteSongs,
-                                  initialIndex: index,
-                                ),
-                              ),
-                            );
-                          },
-                          title: Text(
-                            song?.tittle ?? "Unknown Title",
-                            style: const TextStyle(color: Colors.white),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Text(
-                            song?.artist ?? "Unknown Artist",
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          leading: QueryArtworkWidget(
-                            id: song?.id ?? 1,
-                            type: ArtworkType.AUDIO,
-                            artworkHeight: 40,
-                            artworkWidth: 40,
-                            artworkFit: BoxFit.cover,
-                            nullArtworkWidget: const CircleAvatar(
-                              backgroundColor: Color.fromARGB(255, 46, 19, 86),
-                              child: Icon(
-                                Icons.music_note,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.more_vert, color: Colors.white),
-                            onPressed: () => _showOptionsBottomSheet(context, song, index),
-                          ),
-                        );
+                        final songs =
+                            _favoritesBox!.values.toList().reversed.toList();
+                        final song = songs[index];
+                        //    final song = _favoritesBox!.getAt(index);
+                        //  final  songs = song(index)
+                        return SongListTile(
+                            song: song,
+                            index: index,
+                            onOptionsPressed: () {
+                              SongOptionsHelper.showOptionsBottomSheet(
+                                  context: context, song: song);
+                            },
+                            onTap: () {
+                              SongNavigationHelper.navigateToPlayScreen(
+                                  context: context,
+                                  index: index,
+                                  boxValues: _favoritesBox!.values.toList());
+                            });
                       },
                     ),
         ),
-             const Align(
+        const Align(
           alignment: Alignment.bottomCenter,
           child: MiniPlayer(),
         ),
       ]),
     );
   }
-
-  void _showOptionsBottomSheet(BuildContext context, AllSongs? song, int index) {
-    showModalBottomSheet(
-      backgroundColor: const Color.fromARGB(255, 33, 32, 32),
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text(song?.tittle ?? "Unknown Title", style: const TextStyle(color: Colors.white)),
-                leading: const Icon(Icons.music_note, color: Colors.white),
-                subtitle: Text(song?.artist ?? "Unknown Artist", style: const TextStyle(color: Colors.white70)),
-              ),
-              const Divider(thickness: 0.4),
-              ListTile(
-                leading: const Icon(Icons.remove_circle_outline, color: Colors.white),
-                title: const Text('Remove from this playlist', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  _removeFromFavorites(index);
-                  Navigator.of(context).pop();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.add_rounded, color: Colors.white),
-                title: const Text('Add to playlist', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddTo(song:song,)));
-                },
-              ),
-           
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _removeFromFavorites(int index) {
-    setState(() {
-      _favoritesBox?.deleteAt(index);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Removed from favorites')),
-    );
-  }
+  // void _showOptionsBottomSheet(
+  //     BuildContext context, AllSongs? song, int index) {
+  //   showModalBottomSheet(
+  //     backgroundColor: const Color.fromARGB(255, 33, 32, 32),
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return Container(
+  //         padding: const EdgeInsets.all(16.0),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             ListTile(
+  //               title: Text(song?.tittle ?? "Unknown Title",
+  //                   style: const TextStyle(color: Colors.white)),
+  //               leading: const Icon(Icons.music_note,
+  //                   color: AppGradients.whiteColor),
+  //               subtitle: Text(song?.artist ?? "Unknown Artist",
+  //                   style: const TextStyle(color: Colors.white70)),
+  //             ),
+  //             const Divider(thickness: 0.4),
+  //             ListTile(
+  //               leading: const Icon(Icons.remove_circle_outline,
+  //                   color: AppGradients.whiteColor),
+  //               title: const Text('Remove from this playlist',
+  //                   style: TextStyle(color: AppGradients.whiteColor)),
+  //               onTap: () {
+  //                 _removeFromFavorites(index);
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //             ListTile(
+  //               leading: const Icon(Icons.add_rounded,
+  //                   color: AppGradients.whiteColor),
+  //               title: const Text('Add to playlist',
+  //                   style: TextStyle(color: AppGradients.whiteColor)),
+  //               onTap: () {
+  //                 Navigator.push(
+  //                     context,
+  //                     MaterialPageRoute(
+  //                         builder: (context) => AddTo(
+  //                               song: song,
+  //                             )));
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+  // void _removeFromFavorites(int index) {
+  //   setState(() {
+  //     _favoritesBox?.deleteAt(index);
+  //   });
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text('Removed from favorites')),
+  //   );
+  // }
 }

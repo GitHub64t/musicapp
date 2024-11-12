@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
+import 'package:musicapp/widgets/appgraient.dart';
 
 class AddTo extends StatefulWidget {
   final AllSongs? song;
@@ -104,17 +105,7 @@ class _AddToState extends State<AddTo> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xff663FB9),
-              Color(0xff43297A),
-              Color(0XFF19093B),
-              Colors.black,
-              Colors.black
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient:  AppGradients.thirdGradient
         ),
         child: Column(
           children: [
@@ -122,13 +113,13 @@ class _AddToState extends State<AddTo> {
               backgroundColor: Colors.transparent,
               title: const Text(
                 "Add to Playlist",
-                style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w600),
+                style: TextStyle(color:AppGradients.whiteColor, fontSize: 25, fontWeight: FontWeight.w600),
               ),
               leading: IconButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                icon: const Icon(Icons.arrow_back, color: AppGradients.whiteColor,),
               ),
             ),
             const SizedBox(height: 20),
@@ -149,13 +140,13 @@ class _AddToState extends State<AddTo> {
                       return ListTile(
                         title: Text(
                           playlistName,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: AppGradients.whiteColor,),
                         ),
                         leading: const CircleAvatar(child: Icon(Icons.library_music)),
                         trailing: IconButton(
                           icon: Icon(
                             isInPlaylist ? Icons.remove_circle : Icons.add_circle,
-                            color: Colors.white,
+                            color: AppGradients.whiteColor,
                           ),
                           onPressed: () {
                             if (isInPlaylist) {

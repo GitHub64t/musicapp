@@ -3,13 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/services/audioplayersingleton.dart';
+import 'package:musicapp/widgets/appgraient.dart';
+import 'package:musicapp/widgets/options.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Play extends StatefulWidget {
-    List<MediaItem> songs;
-    int initialIndex;
+  List<MediaItem> songs;
+  int initialIndex;
+  final Duration currentPosition;
 
-  Play({super.key, required this.songs, required this.initialIndex});
+  Play(
+      {super.key,
+      required this.songs,
+      required this.initialIndex,
+      required this.currentPosition});
 
   @override
   State<Play> createState() => _PlayState();
@@ -26,11 +33,14 @@ class _PlayState extends State<Play> {
   void initState() {
     super.initState();
 
+    // Set the current position to the value passed from MiniPlayer or default
+    _currentPosition = widget.currentPosition;
+
     _audioPlayerSingleton.setPlaylist(widget.songs, widget.initialIndex);
     _audioPlayerSingleton.currentIndex = widget.initialIndex;
     _audioPlayerSingleton.playSong(widget.songs[widget.initialIndex]);
 
-    _audioPlayerSingleton.audioPlayer.positionStream.listen((position){
+    _audioPlayerSingleton.audioPlayer.positionStream.listen((position) {
       setState(() {
         _currentPosition = position;
       });
@@ -43,55 +53,73 @@ class _PlayState extends State<Play> {
     });
 
     isPlaying = true;
+
+    // _audioPlayerSingleton.setPlaylist(widget.songs, widget.initialIndex);
+    // _audioPlayerSingleton.currentIndex = widget.initialIndex;
+    // _audioPlayerSingleton.playSong(widget.songs[widget.initialIndex]);
+
+    // _audioPlayerSingleton.audioPlayer.positionStream.listen((position){
+    //   setState(() {
+    //     _currentPosition = position;
+    //   });
+    // });
+
+    // _audioPlayerSingleton.audioPlayer.durationStream.listen((duration) {
+    //   setState(() {
+    //     _totalDuration = duration ?? Duration.zero;
+    //   });
+    // });
+
+    // isPlaying = true;
     openFavoritesBox();
   }
-//   void deletobox() async{
-// await Hive.deleteBoxFromDisk('favorites');
-//   }
 
   Future<void> openFavoritesBox() async {
-  try {
-    favBox = await Hive.openBox<AllSongs>('favorites');
-    setState(() {
-     const ScaffoldMessenger(child: Text("error"));
-    }); // Update the UI after successfully opening the box
-  } catch (e) {
-    print("Error opening favorites box: $e");
+    try {
+      favBox = await Hive.openBox<AllSongs>('favorites');
+      setState(() {
+        const ScaffoldMessenger(child: Text("error"));
+      }); // Update the UI after successfully opening the box
+    } catch (e) {
+      print("Error opening favorites box: $e");
+    }
   }
-}
-
 
   // Check if the current song is in the favorites playlist
-bool isFavorite(MediaItem song) {
-  if (favBox == null) {
-    return false;
+  bool isFavorite(MediaItem song) {
+    if (favBox == null) {
+      return false;
+    }
+    // Check if the song is in the favorites box
+    return favBox!.values.any((favSong) => favSong.uri == song.id);
   }
-  // Check if the song is in the favorites box
-  return favBox!.values.any((favSong) => favSong.uri == song.id);
-}
-
 
   // Add or remove the current song from the favorites playlist
-void toggleFavorite(MediaItem song) async {
-  if (isFavorite(song)) {
-    // Remove from favorites
-    int index = favBox!.values.toList().indexWhere((favSong) => favSong.uri == song.id.toString());
-    if (index != -1) { // Ensure the song is found
-      int key = favBox!.keyAt(index); // Get the key for the song at the found index
-      await favBox!.delete(key); // Delete the song using the key
+  void toggleFavorite(MediaItem song) async {
+    if (isFavorite(song)) {
+      // Remove from favorites
+      int index = favBox!.values
+          .toList()
+          .indexWhere((favSong) => favSong.uri == song.id.toString());
+      if (index != -1) {
+        // Ensure the song is found
+        int key =
+            favBox!.keyAt(index); // Get the key for the song at the found index
+        await favBox!.delete(key); // Delete the song using the key
+      }
+    } else {
+      // Add to favorites
+      AllSongs newFav = AllSongs(
+        id: int.parse(
+            (song.album.toString())), // Handle the id parsing carefully
+        tittle: song.title.toString(),
+        artist: song.artist.toString(),
+        uri: song.id.toString(),
+      );
+      await favBox!.add(newFav);
     }
-  } else {
-    // Add to favorites
-    AllSongs newFav = AllSongs(
-      id: int.parse((song.album.toString())),  // Handle the id parsing carefully
-      tittle: song.title.toString(),
-      artist: song.artist.toString(),
-      uri: song.id.toString(),
-    );
-    await favBox!.add(newFav);
+    setState(() {});
   }
-  setState(() {}); 
-}
 
   void _togglePlayPause() {
     setState(() {
@@ -105,7 +133,8 @@ void toggleFavorite(MediaItem song) async {
   }
 
   void _seekTo(double value) {
-    final newPosition = Duration(milliseconds: (value * _totalDuration.inMilliseconds).toInt());
+    final newPosition =
+        Duration(milliseconds: (value * _totalDuration.inMilliseconds).toInt());
     _audioPlayerSingleton.audioPlayer.seek(newPosition);
     setState(() {
       _currentPosition = newPosition;
@@ -118,33 +147,41 @@ void toggleFavorite(MediaItem song) async {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xff663FB9),
-              Color(0xff43297A),
-              Color(0XFF19093B),
-              Colors.black,
-              Colors.black,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: AppGradients.thirdGradient),
         child: Column(
           children: [
             AppBar(
               backgroundColor: Colors.transparent,
               title: Text(
                 currentSong.title,
-                style: const TextStyle(color:Colors.white , fontSize: 20),
+                style: const TextStyle(
+                    color: AppGradients.whiteColor, fontSize: 20),
               ),
               leading: IconButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                icon: const Icon(Icons.arrow_back,
+                    color: AppGradients.whiteColor),
               ),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    AllSongs songForOptions = AllSongs(
+                      id: int.parse(
+                          currentSong.album ?? '0'), // Handle album ID
+                      tittle: currentSong.title,
+                      artist: currentSong.artist ?? 'Unknown',
+                      uri: currentSong.id.toString(),
+                    );
+                    SongOptionsHelper.showOptionsBottomSheet(
+                        context: context, song: songForOptions);
+                  },
+                  icon: const Icon(Icons.more_vert),
+                  iconSize: 25,
+                  color: AppGradients.whiteColor,
+                ),
+              ],
             ),
             const SizedBox(height: 80),
             QueryArtworkWidget(
@@ -157,7 +194,8 @@ void toggleFavorite(MediaItem song) async {
                 height: 385,
                 width: 345,
                 color: const Color.fromARGB(255, 56, 32, 108),
-                child: const Icon(Icons.music_note, size: 100, color: Colors.white),
+                child: const Icon(Icons.music_note,
+                    size: 100, color: AppGradients.whiteColor),
               ),
               keepOldArtwork: true,
             ),
@@ -176,7 +214,7 @@ void toggleFavorite(MediaItem song) async {
                               child: Text(
                                 currentSong.title,
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  color: AppGradients.whiteColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -184,7 +222,6 @@ void toggleFavorite(MediaItem song) async {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                          
                           ],
                         ),
                         Row(
@@ -193,7 +230,7 @@ void toggleFavorite(MediaItem song) async {
                             Text(
                               currentSong.artist ?? 'Unknown',
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: AppGradients.whiteColor,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w300,
                               ),
@@ -203,12 +240,29 @@ void toggleFavorite(MediaItem song) async {
                       ],
                     ),
                   ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  IconButton(
+                    onPressed: () => toggleFavorite(currentSong),
+                    icon: Icon(
+                      isFavorite(currentSong)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: AppGradients.whiteColor,
+                    ),
+                    iconSize: 25,
+                  ),
                 ],
               ),
             ),
+            const SizedBox(
+              height: 30,
+            ),
             Slider(
               value: _totalDuration.inMilliseconds > 0
-                  ? _currentPosition.inMilliseconds.toDouble() / _totalDuration.inMilliseconds.toDouble()
+                  ? _currentPosition.inMilliseconds.toDouble() /
+                      _totalDuration.inMilliseconds.toDouble()
                   : 0.0,
               onChanged: (value) {
                 _seekTo(value);
@@ -219,55 +273,71 @@ void toggleFavorite(MediaItem song) async {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(formatDuration(_currentPosition), style: const TextStyle(color: Colors.white)),
+                Text(formatDuration(_currentPosition),
+                    style: const TextStyle(color: Colors.white)),
                 const SizedBox(width: 70),
-                Text(formatDuration(_totalDuration), style: const TextStyle(color: Colors.white)),
+                Text(formatDuration(_totalDuration),
+                    style: const TextStyle(color: Colors.white)),
               ],
             ),
-            const SizedBox(height: 40),
+            //const SizedBox(height: 60),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                   IconButton(onPressed: (){}, icon:const Icon(Icons.playlist_add),
-                iconSize: 25,
-                  color: Colors.white,),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.repeat),
+                  iconSize: 25,
+                  color: AppGradients.whiteColor,
+                ),
                 IconButton(
                   onPressed: () {
                     _audioPlayerSingleton.skipPrevious(context);
                     setState(() {
-                      widget.initialIndex = (_audioPlayerSingleton.currentIndex - 1).clamp(0, widget.songs.length - 1);
+                      widget.initialIndex =
+                          (_audioPlayerSingleton.currentIndex - 1)
+                              .clamp(0, widget.songs.length - 1);
                     });
                   },
                   icon: const Icon(Icons.skip_previous_outlined),
                   iconSize: 45,
-                  color: Colors.white,
+                  color: widget.initialIndex > 0
+                      ? AppGradients.whiteColor
+                      : const Color.fromARGB(255, 116, 116, 116),
                 ),
                 IconButton(
                   onPressed: _togglePlayPause,
-                  icon: isPlaying ? const Icon(Icons.pause) : const Icon(Icons.play_arrow),
+                  icon: isPlaying
+                      ? const Icon(Icons.pause)
+                      : const Icon(Icons.play_arrow),
                   iconSize: 55,
-                  color: Colors.white,
+                  color: AppGradients.whiteColor,
                 ),
                 IconButton(
                   onPressed: () {
                     _audioPlayerSingleton.skipNext(context);
                     setState(() {
-                      widget.initialIndex = (_audioPlayerSingleton.currentIndex + 1).clamp(0, widget.songs.length - 1);
+                      widget.initialIndex =
+                          (_audioPlayerSingleton.currentIndex + 1)
+                              .clamp(0, widget.songs.length - 1);
                     });
                   },
                   icon: const Icon(Icons.skip_next_outlined),
                   iconSize: 45,
-                  color: Colors.white,
+                  color: widget.initialIndex < widget.songs.length - 1
+                      ? AppGradients.whiteColor // Active color
+                      : const Color.fromARGB(255, 116, 116,
+                          116), // Inactive color (when at the last song)
                 ),
-              
-                    IconButton(
-                              onPressed: () => toggleFavorite(currentSong),
-                              icon: Icon(
-                                isFavorite(currentSong) ? Icons.favorite : Icons.favorite_border,
-                                color: Colors.white,
-                              ),
-                              iconSize: 25,
-                            ),
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Icons.shuffle,
+                    color: AppGradients.whiteColor,
+                  ),
+                  iconSize: 25,
+                ),
               ],
             ),
           ],

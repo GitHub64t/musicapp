@@ -1,14 +1,15 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
-import 'package:musicapp/music_app/play.dart';
-import 'package:musicapp/services/audioplayersingleton.dart';
-import 'package:musicapp/widgets/addplaylist_widget.dart';
+import 'package:musicapp/widgets/appgraient.dart';
 import 'package:musicapp/widgets/miniplayer.dart';
+import 'package:musicapp/widgets/navigation.dart';
+import 'package:musicapp/widgets/options.dart';
+import 'package:musicapp/widgets/songListtile.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
+// ignore: camel_case_types
 class All_Songs extends StatefulWidget {
   const All_Songs({super.key});
 
@@ -47,7 +48,6 @@ class _AllSongsState extends State<All_Songs> {
 
   Future<void> fetchAndStoreSongs() async {
     try {
-      // Open the Hive box
       await Hive.deleteBoxFromDisk('all_audio_data');
       songBox = await Hive.openBox<AllSongs>('all_audio_data');
       List<SongModel> songs = await _audioQuery.querySongs();
@@ -121,13 +121,8 @@ class _AllSongsState extends State<All_Songs> {
       body: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xff6A42BF), Color(0xff271748), Colors.black],
-                end: Alignment.bottomCenter,
-                begin: Alignment.topCenter,
-              ),
-            ),
+            decoration:
+                const BoxDecoration(gradient: AppGradients.primaryGradient),
             child: Column(
               children: [
                 const SizedBox(height: 60),
@@ -140,14 +135,15 @@ class _AllSongsState extends State<All_Songs> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: const Icon(Icons.arrow_back,
+                            color: AppGradients.whiteColor),
                       ),
                       const Flexible(
                         child: Text(
                           "All Songs",
                           style: TextStyle(
                             fontSize: 25,
-                            color: Colors.white,
+                            color: AppGradients.whiteColor,
                             fontWeight: FontWeight.w600,
                             decoration: TextDecoration.none,
                           ),
@@ -168,20 +164,11 @@ class _AllSongsState extends State<All_Songs> {
                         height: 100,
                         width: 100,
                         decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 91, 55, 168),
-                              Color(0xff351F64),
-                              Color(0xff1E0D43),
-                            ],
-                            end: Alignment.bottomCenter,
-                            begin: Alignment.topCenter,
-                          ),
-                        ),
+                            gradient: AppGradients.secondaryGradient),
                         child: const Center(
                           child: Icon(
                             Icons.music_note,
-                            color: Colors.white,
+                            color: AppGradients.whiteColor,
                             size: 40,
                           ),
                         ),
@@ -194,7 +181,7 @@ class _AllSongsState extends State<All_Songs> {
                           Text(
                             "All Songs",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppGradients.whiteColor,
                               decoration: TextDecoration.none,
                               fontWeight: FontWeight.normal,
                               fontSize: 25,
@@ -203,7 +190,7 @@ class _AllSongsState extends State<All_Songs> {
                           Text(
                             "Playlist",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppGradients.whiteColor,
                               decoration: TextDecoration.none,
                               fontSize: 20,
                               fontWeight: FontWeight.w200,
@@ -214,7 +201,7 @@ class _AllSongsState extends State<All_Songs> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -230,99 +217,49 @@ class _AllSongsState extends State<All_Songs> {
               ),
             ),
             child: TextField(
-              controller: _searchController,
-              style: const TextStyle(color: Colors.grey),
-              decoration: const InputDecoration(
-                hintText: '  Search music...',
-                hintStyle: TextStyle(color: Color.fromARGB(255, 164, 164, 164)),
-                border: InputBorder.none,
-                suffixIcon: Icon(Icons.search, color: Colors.grey),
-                labelStyle: TextStyle(color: Colors.white),
-                fillColor: Colors.white,
-              ),
-              cursorColor: Colors.white,
-            ),
+                controller: _searchController,
+                style: const TextStyle(color: Colors.grey),
+                decoration: const InputDecoration(
+                    hintText: '  Search music...',
+                    hintStyle:
+                        TextStyle(color: Color.fromARGB(255, 164, 164, 164)),
+                    border: InputBorder.none,
+                    suffixIcon: Icon(Icons.search, color: Colors.grey),
+                    labelStyle: TextStyle(color: Colors.white),
+                    fillColor: AppGradients.whiteColor),
+                cursorColor: AppGradients.whiteColor),
           ),
+          const SizedBox(height: 10),
           Expanded(
             child: _filteredSongs.isEmpty && _searchController.text.isNotEmpty
                 ? const Center(
                     child: Text(
                       "No Songs Found",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppGradients.whiteColor,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   )
                 : ListView.builder(
+                    padding: EdgeInsets.zero,
                     itemCount: _filteredSongs.length,
                     itemBuilder: (context, index) {
                       var song = _filteredSongs[index];
-
-                      return ListTile(
-                        title: Text(
-                          song.tittle,
-                          style: const TextStyle(color: Colors.white),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                      return SongListTile(
+                        song: song,
+                        index: index,
                         onTap: () {
-                          List<MediaItem> playlist = _filteredSongs.map((s) {
-                            return MediaItem(
-                                id: s.uri,
-                                title: s.tittle,
-                                artist: s.artist,
-                                album: s.id.toString());
-                          }).toList();
-
-                          // AudioPlayerSingleton()
-                          //     .setPlaylist(playlist, index); //chsnged
-                          // AudioPlayerSingleton().playSong(MediaItem(
-                          //   id: song.uri,
-                          //   title: song.tittle,
-                          //   artist: song.artist,
-                          //   album: song.id.toString(),
-                          // ));
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Play(
-                                songs: playlist,
-                                initialIndex: _filteredSongs.indexOf(song),
-                              ),
-                            ),
-                          );
+                          SongNavigationHelper.navigateToPlayScreen(
+                              context: context,
+                              boxValues: _filteredSongs.reversed.toList(),
+                              index: index);
                         },
-                        subtitle: Text(
-                          song.artist,
-                          style: const TextStyle(color: Colors.white60),
-                        ),
-                        leading: QueryArtworkWidget(
-                          id: song.id,
-                          type: ArtworkType.AUDIO,
-                          artworkHeight: 40,
-                          artworkWidth: 40,
-                          artworkFit: BoxFit.cover,
-                          nullArtworkWidget: const CircleAvatar(
-                            backgroundColor: Color.fromARGB(255, 46, 19, 86),
-                            child: Icon(
-                              Icons.music_note,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        trailing: IconButton(
-                            icon: const Icon(Icons.more_vert,
-                                color: Colors.white),
-                            onPressed: () {
-                              AddplaylistWidget.showOptionsBottomSheet(
-                                  song: song,
-                                  context: context,
-                                  songName: song.tittle,
-                                  singerName: song.artist);
-                            }),
+                        onOptionsPressed: () {
+                          SongOptionsHelper.showOptionsBottomSheet(
+                              context: context, song: song);
+                        },
                       );
                     },
                   ),
@@ -336,81 +273,3 @@ class _AllSongsState extends State<All_Songs> {
     );
   }
 }
-
-
-
-//   void _showOptionsBottomSheet(BuildContext context) {
-//     showModalBottomSheet(
-//       backgroundColor: const Color.fromARGB(255, 33, 32, 32),
-//       context: context,
-//       builder: (BuildContext context) {
-//         return Container(
-//           padding: const EdgeInsets.all(16.0),
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               const ListTile(
-//                 title: Text(
-//                   'song name',
-//                   style: TextStyle(color: Colors.white),
-//                 ),
-//                 leading: Icon(
-//                   Icons.music_note,
-//                   color: Colors.white,
-//                 ),
-//                 subtitle: Text(
-//                   "singername",
-//                   style: TextStyle(
-//                     color: Colors.white70,
-//                   ),
-//                 ),
-//               ),
-//               const Divider(
-//                 thickness: 0.4,
-//               ),
-//               ListTile(
-//                 leading: const Icon(
-//                   Icons.remove_circle_outline,
-//                   color: Colors.white,
-//                 ),
-//                 title: const Text(
-//                   'Remove from this playlist',
-//                   style: TextStyle(color: Colors.white),
-//                 ),
-//                 onTap: () {
-//                   Navigator.of(context).pop();
-//                   // Handle Option 2 action
-//                   ScaffoldMessenger.of(context).showSnackBar(
-//                     const SnackBar(
-//                         content: Text(
-//                       'Remove from this playlist',
-//                       style: TextStyle(color: Colors.white),
-//                     )),
-//                   );
-//                 },
-//               ),
-//               ListTile(
-//                 leading: const Icon(
-//                   Icons.add_rounded,
-//                   color: Colors.white,
-//                 ),
-//                 title: const Text(
-//                   'add to playlist',
-//                   style: TextStyle(color: Colors.white),
-//                 ),
-//                 onTap: () {
-//                   Navigator.push(context,
-//                       MaterialPageRoute(builder: (context) => const AddTo()));
-//                   // Handle Option 3 action
-//                   // ScaffoldMessenger.of(context).showSnackBar(
-//                   //   SnackBar(content: Text('')),
-//                   // );
-//                 },
-//               ),
-//             ],
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/music_app/play.dart';
+import 'package:musicapp/widgets/appgraient.dart';
+import 'package:musicapp/widgets/miniplayer.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class MostlyPlayedScreen extends StatefulWidget {
@@ -37,10 +39,8 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
       body: Column(children: [
         Container(
           decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [Color(0xff6A42BF), Color(0xff271748), Colors.black],
-                  end: Alignment.bottomCenter,
-                  begin: Alignment.topCenter)),
+            gradient: AppGradients.primaryGradient,
+          ),
           child: Column(children: [
             const SizedBox(height: 60),
             Row(
@@ -52,12 +52,12 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
                     },
                     icon: const Icon(
                       Icons.arrow_back,
-                      color: Colors.white,
+                      color: AppGradients.whiteColor,
                     )),
                 const Text("Mostly played",
                     style: TextStyle(
                         fontSize: 25,
-                        color: Colors.white,
+                        color: AppGradients.whiteColor,
                         fontWeight: FontWeight.w600,
                         decoration: TextDecoration.none)),
                 const SizedBox(width: 50),
@@ -74,18 +74,12 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
                     height: 100,
                     width: 100,
                     decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                          Color.fromARGB(255, 91, 55, 168),
-                          Color(0xff351F64),
-                          Color(0xff1E0D43)
-                        ],
-                            end: Alignment.bottomCenter,
-                            begin: Alignment.topCenter)),
+                      gradient: AppGradients.secondaryGradient,
+                    ),
                     child: const Center(
                       child: Icon(
                         Icons.skip_previous_outlined,
-                        color: Colors.white,
+                        color: AppGradients.whiteColor,
                         size: 40,
                       ),
                     ),
@@ -98,14 +92,14 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
                       Text(
                         "Mostly Played",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppGradients.whiteColor,
                             decoration: TextDecoration.none,
                             fontWeight: FontWeight.normal,
                             fontSize: 25),
                       ),
                       Text("Playlist",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: AppGradients.whiteColor,
                               decoration: TextDecoration.none,
                               fontSize: 20,
                               fontWeight: FontWeight.w200))
@@ -121,70 +115,131 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
           child: mostlyPlayedBox == null || mostlyPlayedBox!.isEmpty
               ? const Center(
                   child: Text('No mostly played songs available',
-                      style: TextStyle(color: Colors.white)))
+                      style: TextStyle(color: AppGradients.whiteColor)))
               : ListView.builder(
-                  itemCount: mostlyPlayedBox!.length<11 ? mostlyPlayedBox!.length:10,
+                  padding: EdgeInsets.zero,
+                  itemCount: mostlyPlayedBox!.length < 11 
+                      ? mostlyPlayedBox!.length
+                      : 10,
                   itemBuilder: (context, index) {
                     final songs = mostlyPlayedBox!.values.toList()
                       ..sort((a, b) =>
                           (b.playCount ?? 0).compareTo(a.playCount ?? 0));
                     final song = songs[index];
-                    return ListTile(
-                      title: Text(
-                        'Played this song ${song.playCount} ${song.playCount == 1 ? "time" : "times"}',
-                        style: const TextStyle(color: Colors.white),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onTap: () {
-                        List<MediaItem> recentlyPlayed =
-                            songs.map((recent) {
-                          return MediaItem(
-                            id: recent.uri,
-                            title: recent.tittle,
-                            artist: recent.artist,
-                            album: recent.id.toString(),
-                          );
-                        }).toList();
+                    return song.playCount! >= 5
+    ? ListTile(
+        title: Text(
+          'This song played ${song.playCount} times',
+          style: const TextStyle(color: AppGradients.whiteColor),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        onTap: () {
+          List<MediaItem> songList = songs
+              .map((item) => MediaItem(
+                    id: item.uri,
+                    title: item.tittle,
+                    artist: item.artist,
+                    album: item.id.toString(),
+                  ))
+              .toList();
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Play(
-                              songs: recentlyPlayed,
-                              initialIndex: index,
-                            ),
-                          ),
-                        );
-                      },
-                      subtitle: Text(
-                        song.tittle,
-                        style: const TextStyle(color: Colors.white60),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      leading: QueryArtworkWidget(
-                        id: song.id,
-                        type: ArtworkType.AUDIO,
-                        artworkHeight: 40,
-                        artworkWidth: 40,
-                        artworkFit: BoxFit.cover,
-                        nullArtworkWidget: const CircleAvatar(
-                          backgroundColor: Color.fromARGB(255, 46, 19, 86),
-                          child: Icon(
-                            Icons.music_note,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.more_vert, color: Colors.white),
-                        onPressed: () {},
-                      ),
-                    );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Play(
+                songs: songList,
+                initialIndex: index,
+                currentPosition: Duration.zero,
+              ),
+            ),
+          );
+        },
+        subtitle: Text(
+          song.tittle,
+          style: const TextStyle(color: Colors.white60),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        leading: QueryArtworkWidget(
+          id: song.id,
+          type: ArtworkType.AUDIO,
+          artworkHeight: 40,
+          artworkWidth: 40,
+          artworkFit: BoxFit.cover,
+          nullArtworkWidget: const CircleAvatar(
+            backgroundColor: Color.fromARGB(255, 46, 19, 86),
+            child: Icon(
+              Icons.music_note,
+              color: AppGradients.whiteColor,
+            ),
+          ),
+        ),
+      )
+    : SizedBox();  // If playCount is less than 5, show an empty container
+
+                   
+    //                 return 
+    //                  ListTile(
+                    
+    //   title: Text( 
+    //      song.playCount! < 5 ? '' : 'This song played ${song.playCount} times',
+    //     style: const TextStyle(color: AppGradients.whiteColor),
+    //     maxLines: 1,
+    //     overflow: TextOverflow.ellipsis,
+    //   ),
+    //  onTap: () {
+    //       List<MediaItem> song = songs
+    //     .map((item) => MediaItem(
+    //           id: item.uri,
+    //           title: item.tittle,
+    //           artist: item.artist,
+    //           album: item.id.toString(),
+    //         ))
+    //     .toList();
+        
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => Play(
+    //       songs: song,
+    //       initialIndex: index,
+    //       currentPosition: Duration.zero,
+    //     ),
+    //   ),
+    // );
+  
+    //  },
+    //   subtitle: Text(
+    //     song.tittle,
+    //     style: const TextStyle(color: Colors.white60),
+    //       maxLines: 1,
+    //     overflow: TextOverflow.ellipsis,
+    //   ),
+    //   leading: QueryArtworkWidget(
+    //     id: song.id,
+    //     type: ArtworkType.AUDIO,
+    //     artworkHeight: 40,
+    //     artworkWidth: 40,
+    //     artworkFit: BoxFit.cover,
+    //     nullArtworkWidget: const CircleAvatar(
+    //       backgroundColor: Color.fromARGB(255, 46, 19, 86),
+    //       child: Icon(
+    //         Icons.music_note,
+    //         color: AppGradients.whiteColor,
+    //       ),
+    //     ),
+    //   ),
+    // );
                   },
                 ),
-        )
+                
+        ),
+       const Align(
+            alignment: Alignment.bottomCenter,
+            child: MiniPlayer(),
+          ),    
       ]),
     );
   }

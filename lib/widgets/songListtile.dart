@@ -1,44 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:musicapp/widgets/appgraient.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 class SongListTile extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-  final String artist;
+  final dynamic song; // Replace with your actual song type
+  final int index;
+  final VoidCallback onTap;
+  final VoidCallback? onOptionsPressed;
 
-  const SongListTile({super.key, 
-    required this.imageUrl,
-    required this.title,
-    required this.artist,
+  const SongListTile({
+    super.key,
+    required this.song,
+    required this.index,
+    required this.onTap,
+    this.onOptionsPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Container(
-        decoration:BoxDecoration(
-     borderRadius: BorderRadius.circular(8.0),
-        ) ,
-   
-        child: Image.asset(
-          imageUrl,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
+      title: Text(
+        song.tittle,
+        style: const TextStyle(color: AppGradients.whiteColor),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      onTap: onTap,
+      subtitle: Text(
+        song.artist,
+        style: const TextStyle(color: Colors.white60),
+      ),
+      leading: QueryArtworkWidget(
+        id: song.id,
+        type: ArtworkType.AUDIO,
+        artworkHeight: 40,
+        artworkWidth: 40,
+        artworkFit: BoxFit.cover,
+        nullArtworkWidget: const CircleAvatar(
+          backgroundColor: Color.fromARGB(255, 46, 19, 86),
+          child: Icon(
+            Icons.music_note,
+            color: AppGradients.whiteColor,
+          ),
         ),
       ),
-      title: Text(
-        title,
-        style: const TextStyle(color: Colors.white),
-      ),
-      subtitle: Text(
-        artist,
-        style: const TextStyle(color: Colors.white70),
-      ),
       trailing: IconButton(
-        icon: const Icon(Icons.more_vert, color: Colors.white),
-        onPressed: () {
-          // Handle more actions
-        },
+        icon: const Icon(Icons.more_vert, color: AppGradients.whiteColor),
+        onPressed: onOptionsPressed,
       ),
     );
   }
