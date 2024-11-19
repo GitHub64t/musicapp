@@ -23,4 +23,5 @@ class AppGradients {
           Colors.black
         ], begin: Alignment.topLeft);
   static const Color whiteColor = Colors.white;
+  static const Color blackColor = Colors.black;
 }

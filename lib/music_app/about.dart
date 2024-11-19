@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:musicapp/music_app/privacy_policy.dart';
 import 'package:musicapp/music_app/terms_conditions.dart';
-import 'package:musicapp/music_app/version.dart';
 import 'package:musicapp/widgets/appgraient.dart';
 
 class About extends StatelessWidget {
@@ -45,16 +44,27 @@ class About extends StatelessWidget {
                 const SizedBox(
                 height: 25,
               ),
-                    ListTile(
-              title:const Text( "Version",style: TextStyle(
-                color: AppGradients.whiteColor
-              ),),
-              trailing:const Icon(Icons.arrow_forward,color:AppGradients.whiteColor,),
-              onTap: () {
-                Navigator.push(context, 
-                MaterialPageRoute(builder: (context)=>const Version()));
-              },
-            ),
+             const Text(
+                              'Version 1.0.0',
+                              style: TextStyle(
+                                  fontSize: 18, color: AppGradients.whiteColor),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              textAlign: TextAlign.center,
+                              'EchoSync is a modern music player built with Flutter, offering seamless audio playback, playlist management, and an intuitive user experience.',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color.fromARGB(255, 196, 196, 196),
+                              ),
+                            ),
+                     const SizedBox(height: 10,),
+                           const Divider(
+                          endIndent: 25,
+                          indent: 25,
+                          thickness: 0.5,
+                          height: 40,
+                           ),
             ListTile(
               title:const Text( "Terms and Conditions",style: TextStyle(
                 color: AppGradients.whiteColor
@@ -82,28 +92,4 @@ class About extends StatelessWidget {
       ),
     );
   }
-
-  // Widget _buildSection(String title, String content) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text(
-  //         title,
-  //         style: const TextStyle(
-  //             color:AppGradients.whiteColor,
-  //             fontSize: 20,
-  //             fontWeight: FontWeight.w700),
-  //       ),
-  //       const SizedBox(height: 5),
-  //       Text(
-  //         content,
-  //         style: const TextStyle(
-  //             color: AppGradients.whiteColor,
-  //             fontSize: 15,
-  //             fontWeight: FontWeight.w400),
-  //       ),
-  //       const SizedBox(height: 20),
-  //     ],
-  //   );
-  // }
 }

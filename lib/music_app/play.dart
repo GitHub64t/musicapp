@@ -1,8 +1,12 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/services/audioplayersingleton.dart';
+
 import 'package:musicapp/widgets/appgraient.dart';
 import 'package:musicapp/widgets/options.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -28,6 +32,7 @@ class _PlayState extends State<Play> {
   Duration _totalDuration = Duration.zero;
   bool isPlaying = false;
   Box<AllSongs>? favBox;
+  bool isShuffle = false;
 
   @override
   void initState() {
@@ -52,26 +57,27 @@ class _PlayState extends State<Play> {
       });
     });
 
+    _audioPlayerSingleton.audioPlayer.currentIndexStream.listen((index) {
+      if (index != null && index >= 0 && index < widget.songs.length) {
+        setState(() {
+          widget.initialIndex = index;
+        });
+      }
+    });
+
+    _audioPlayerSingleton.audioPlayer.playerStateStream.listen((playerState) {
+      if (playerState.processingState == ProcessingState.completed &&
+          _audioPlayerSingleton.repeatMode == LoopMode.one) {
+        // If repeat one is active, manually turn it off after one repeat
+        setState(() {
+          _audioPlayerSingleton.toggleRepeatMode(); // Disable repeat mode
+        });
+      }
+    });
+
     isPlaying = true;
-
-    // _audioPlayerSingleton.setPlaylist(widget.songs, widget.initialIndex);
-    // _audioPlayerSingleton.currentIndex = widget.initialIndex;
-    // _audioPlayerSingleton.playSong(widget.songs[widget.initialIndex]);
-
-    // _audioPlayerSingleton.audioPlayer.positionStream.listen((position){
-    //   setState(() {
-    //     _currentPosition = position;
-    //   });
-    // });
-
-    // _audioPlayerSingleton.audioPlayer.durationStream.listen((duration) {
-    //   setState(() {
-    //     _totalDuration = duration ?? Duration.zero;
-    //   });
-    // });
-
-    // isPlaying = true;
     openFavoritesBox();
+    setState(() {});
   }
 
   Future<void> openFavoritesBox() async {
@@ -81,6 +87,7 @@ class _PlayState extends State<Play> {
         const ScaffoldMessenger(child: Text("error"));
       }); // Update the UI after successfully opening the box
     } catch (e) {
+      // ignore: avoid_print
       print("Error opening favorites box: $e");
     }
   }
@@ -138,6 +145,19 @@ class _PlayState extends State<Play> {
     _audioPlayerSingleton.audioPlayer.seek(newPosition);
     setState(() {
       _currentPosition = newPosition;
+    });
+  }
+
+  void _toggleRepeat() {
+    setState(() {
+      _audioPlayerSingleton.toggleRepeatMode();
+    });
+  }
+
+  void _toggleShuffle() {
+    setState(() {
+      isShuffle = !isShuffle;
+      _audioPlayerSingleton.toggleShuffleMode(); // Enable/disable shuffle
     });
   }
 
@@ -261,8 +281,9 @@ class _PlayState extends State<Play> {
             ),
             Slider(
               value: _totalDuration.inMilliseconds > 0
-                  ? _currentPosition.inMilliseconds.toDouble() /
-                      _totalDuration.inMilliseconds.toDouble()
+                  ? (_currentPosition.inMilliseconds.toDouble() /
+                          _totalDuration.inMilliseconds.toDouble())
+                      .clamp(0.0, 1.0)
                   : 0.0,
               onChanged: (value) {
                 _seekTo(value);
@@ -286,25 +307,68 @@ class _PlayState extends State<Play> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.repeat),
-                  iconSize: 25,
-                  color: AppGradients.whiteColor,
+                  icon: Icon(
+                    _audioPlayerSingleton.repeatMode == LoopMode.one
+                        ? Icons.repeat_one // Display repeat one icon
+                        : Icons
+                            .repeat, // Display regular repeat icon for off mode
+                  ),
+                  color: _audioPlayerSingleton.repeatMode == LoopMode.one
+                      ? Colors.blue // Active color when repeat one is enabled
+                      : Colors.grey, // Inactive color when repeat is off
+                  onPressed:
+                      _toggleRepeat, // Toggle repeat mode on button press
                 ),
                 IconButton(
-                  onPressed: () {
-                    _audioPlayerSingleton.skipPrevious(context);
-                    setState(() {
-                      widget.initialIndex =
-                          (_audioPlayerSingleton.currentIndex - 1)
-                              .clamp(0, widget.songs.length - 1);
-                    });
-                  },
-                  icon: const Icon(Icons.skip_previous_outlined),
+                  onPressed: (() {
+                    // Conditions for disabling skip-previous functionality
+                    final isRepeatOne =
+                        _audioPlayerSingleton.repeatMode == LoopMode.one;
+                    final isFirstSong =
+                        !_audioPlayerSingleton.audioPlayer.shuffleModeEnabled &&
+                            _audioPlayerSingleton.currentIndex == 0;
+
+                    // Check if skipping is disabled in repeat mode or at the beginning of the playlist
+                    if (isRepeatOne || isFirstSong) {
+                      // Show SnackBar if skipping is disabled
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isRepeatOne
+                                ? "Skipping is disabled in repeat mode."
+                                : "You are at the beginning of the playlist.",
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      // Normal skip previous functionality
+                      _audioPlayerSingleton.skipPrevious(context);
+                      setState(() {
+                        widget.initialIndex =
+                            (_audioPlayerSingleton.currentIndex - 1)
+                                .clamp(0, widget.songs.length - 1);
+                      });
+                    }
+                  }),
+                  icon: Icon(
+                    Icons.skip_previous,
+                    color: (() {
+                      final isRepeatOne =
+                          _audioPlayerSingleton.repeatMode == LoopMode.one;
+                      final isFirstSong =
+                          _audioPlayerSingleton.currentIndex == 0;
+
+                      return (isRepeatOne ||
+                              isFirstSong &&
+                                  !_audioPlayerSingleton
+                                      .audioPlayer.shuffleModeEnabled)
+                          ? const Color.fromARGB(
+                              255, 116, 116, 116) // Gray color when disabled
+                          : AppGradients.whiteColor;
+                    }()),
+                  ),
                   iconSize: 45,
-                  color: widget.initialIndex > 0
-                      ? AppGradients.whiteColor
-                      : const Color.fromARGB(255, 116, 116, 116),
                 ),
                 IconButton(
                   onPressed: _togglePlayPause,
@@ -315,26 +379,95 @@ class _PlayState extends State<Play> {
                   color: AppGradients.whiteColor,
                 ),
                 IconButton(
-                  onPressed: () {
-                    _audioPlayerSingleton.skipNext(context);
-                    setState(() {
-                      widget.initialIndex =
-                          (_audioPlayerSingleton.currentIndex + 1)
-                              .clamp(0, widget.songs.length - 1);
-                    });
-                  },
-                  icon: const Icon(Icons.skip_next_outlined),
+                  onPressed: (() {
+                    // Conditions for disabling skip-next functionality
+                    final isRepeatOne =
+                        _audioPlayerSingleton.repeatMode == LoopMode.one;
+                    final isLastSong =
+                        !_audioPlayerSingleton.audioPlayer.shuffleModeEnabled &&
+                            _audioPlayerSingleton.currentIndex ==
+                                widget.songs.length - 1;
+
+                    if (isRepeatOne ||
+                        (isLastSong &&
+                            !_audioPlayerSingleton
+                                .audioPlayer.shuffleModeEnabled)) {
+                      // Show SnackBar if skipping is disabled
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isRepeatOne
+                                ? "Skipping is disabled in repeat-one mode."
+                                : "You have reached the end of the playlist.",
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      // Normal skip next functionality
+                      _audioPlayerSingleton.skipNext(context);
+                      setState(() {
+                        widget.initialIndex = _audioPlayerSingleton.currentIndex
+                            .clamp(0, widget.songs.length - 1);
+                      });
+                    }
+                  }),
+                  icon: Icon(
+                    Icons.skip_next,
+                    color: (() {
+                      final isRepeatOne =
+                          _audioPlayerSingleton.repeatMode == LoopMode.one;
+                      final isLastSong = !_audioPlayerSingleton
+                              .audioPlayer.shuffleModeEnabled &&
+                          _audioPlayerSingleton.currentIndex ==
+                              widget.songs.length - 1;
+
+                      return (isRepeatOne ||
+                              (isLastSong &&
+                                  !_audioPlayerSingleton
+                                      .audioPlayer.shuffleModeEnabled))
+                          ? const Color.fromARGB(
+                              255, 116, 116, 116) // Gray color when disabled
+                          : AppGradients.whiteColor;
+                    }()),
+                  ),
                   iconSize: 45,
-                  color: widget.initialIndex < widget.songs.length - 1
-                      ? AppGradients.whiteColor // Active color
-                      : const Color.fromARGB(255, 116, 116,
-                          116), // Inactive color (when at the last song)
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: _audioPlayerSingleton.playlistList.length < 5 ||
+                          _audioPlayerSingleton.repeatMode == LoopMode.one
+                      ? () {
+                          // Show a Scaffold message (Snackbar) if shuffle is unavailable due to playlist length or repeat mode
+                          String message = '';
+
+                          if (_audioPlayerSingleton.playlistList.length < 5) {
+                            message =
+                                'Shuffle is unavailable. Playlist must have at least 5 songs.';
+                          } else if (_audioPlayerSingleton.repeatMode ==
+                              LoopMode.one) {
+                            message =
+                                'Shuffle is unavailable. Repeat mode is on.';
+                          }
+
+                          // Show Snackbar with the message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(message),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      : _toggleShuffle, // Enable shuffle when playlist length is >= 5 and repeat mode is off
                   icon: Icon(
                     Icons.shuffle,
-                    color: AppGradients.whiteColor,
+                    color: _audioPlayerSingleton.playlistList.length < 5 ||
+                            _audioPlayerSingleton.repeatMode == LoopMode.one
+                        ? const Color.fromARGB(
+                            255, 116, 116, 116) // Gray color when disabled
+                        : (_audioPlayerSingleton.audioPlayer.shuffleModeEnabled
+                            ? Colors.blue
+                            : AppGradients
+                                .whiteColor), // Active color for shuffle
                   ),
                   iconSize: 25,
                 ),

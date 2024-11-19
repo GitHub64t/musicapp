@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:musicapp/music_app/add_to.dart';
+import 'package:musicapp/music_app/add_to_playlist.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/widgets/appgraient.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -21,7 +21,9 @@ class SongOptionsHelper {
               ListTile(
                 title: Text(
                   song.tittle,
-                  style: const TextStyle(color: AppGradients.whiteColor),
+                  style: const TextStyle(color: AppGradients.whiteColor,),
+                  maxLines: 1,
+        overflow: TextOverflow.ellipsis,
                 ),
                 leading: QueryArtworkWidget(
                   id: song.id,

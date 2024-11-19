@@ -51,6 +51,7 @@ class _AddToState extends State<AddTo> {
     final songIndex = playlistBox.values.toList().indexWhere((song) => song.id == widget.song?.id);
     if (songIndex != -1) {
       await playlistBox.deleteAt(songIndex);
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Song removed from $playlistName')),
       );
@@ -90,6 +91,7 @@ class _AddToState extends State<AddTo> {
                   setState(() {
                     playlists.add(newPlaylistName);
                   });
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
                 }
               },
@@ -122,12 +124,32 @@ class _AddToState extends State<AddTo> {
                 icon: const Icon(Icons.arrow_back, color: AppGradients.whiteColor,),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 20,),
+               SizedBox(
+                height: 80,
+                width: 80,
+                child: Image.asset(
+                  "assets/images/logo.png",
+                )),
+             const SizedBox(height: 10,),   
+           const Padding(
+              padding:  EdgeInsets.all(20),
+              child:  Text(
+                          "If you want to add a new playlist, press the button below.",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppGradients.whiteColor,
+                            fontWeight: FontWeight.w300,
+                            letterSpacing: 1,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+            ),
             ElevatedButton(
               onPressed: _addPlaylist,
-              child: const Text("New Playlist"),
+              child: const Text("New Playlist",style: TextStyle(color: Colors.black)),
             ),
-            const SizedBox(height: 30),
+           // const SizedBox(height: 30),
             Expanded(
               child: ListView.builder(
                 itemCount: playlists.length,
@@ -162,18 +184,18 @@ class _AddToState extends State<AddTo> {
                 },
               ),
             ),
-            const SizedBox(height: 20),
+          
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Done"),
-            ),
+              child: const Text("Done",style: TextStyle(color: Colors.black),),
+            ), const SizedBox(height: 45),
           ],
         ),
       ),
     );
-  }
+}
 }
 
 

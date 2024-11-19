@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audio_service/audio_service.dart';
-
+import 'package:just_audio/just_audio.dart';
 import 'package:musicapp/services/audioplayersingleton.dart';
 import 'package:musicapp/widgets/appgraient.dart';
 
@@ -116,15 +116,22 @@ class _MiniPlayerState extends State<MiniPlayer> {
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(
-                          Icons.skip_previous,
-                          color: _audioPlayerSingleton.currentIndex > 0
-                              ? AppGradients.whiteColor
-                              : const Color.fromARGB(255, 116, 116, 116),
-                        ),
-                        onPressed: () =>
-                            _audioPlayerSingleton.skipPrevious(context),
-                      ),
+  icon: Icon(
+    Icons.skip_previous,
+    color: _audioPlayerSingleton.repeatMode == LoopMode.one ||
+            _audioPlayerSingleton.currentIndex <= 0
+        ? const Color.fromARGB(255, 116, 116, 116) // Gray color when repeat mode is on or already at the start
+        : AppGradients.whiteColor, // Normal color when repeat mode is off and not at the start of the playlist
+  ),
+  onPressed: _audioPlayerSingleton.repeatMode == LoopMode.one || 
+            _audioPlayerSingleton.currentIndex <= 0
+      ? null // Disable the button if repeat mode is on or at the start of the playlist
+      : () {
+          _audioPlayerSingleton.skipPrevious(context);
+          setState(() {});
+        },
+),
+
                       IconButton(
                         icon: Icon(
                           isPlaying ? Icons.pause : Icons.play_arrow,
@@ -132,17 +139,23 @@ class _MiniPlayerState extends State<MiniPlayer> {
                         ),
                         onPressed: _togglePlayPause,
                       ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.skip_next,
-                          color: _audioPlayerSingleton.currentIndex <
-                                  _audioPlayerSingleton.playlistList.length - 1
-                              ? AppGradients.whiteColor
-                              : const Color.fromARGB(255, 116, 116, 116),
-                        ),
-                        onPressed: () =>
-                            _audioPlayerSingleton.skipNext(context),
-                      ),
+                     IconButton(
+  icon: Icon(
+    Icons.skip_next,
+    color: _audioPlayerSingleton.repeatMode == LoopMode.one ||
+            _audioPlayerSingleton.currentIndex >= _audioPlayerSingleton.playlistList.length - 1
+        ? const Color.fromARGB(255, 116, 116, 116) // Gray color when repeat mode is on or already at the last song
+        : AppGradients.whiteColor, // Normal color when repeat mode is off and not at the end of the playlist
+  ),
+  onPressed: _audioPlayerSingleton.repeatMode == LoopMode.one || 
+            _audioPlayerSingleton.currentIndex >= _audioPlayerSingleton.playlistList.length - 1
+      ? null // Disable the button if repeat mode is on or at the last song
+      : () {
+          _audioPlayerSingleton.skipNext(context);
+          setState(() {});
+        },
+),
+
                     ],
                   ),
                 ],

@@ -118,15 +118,17 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
                       style: TextStyle(color: AppGradients.whiteColor)))
               : ListView.builder(
                   padding: EdgeInsets.zero,
-                  itemCount: mostlyPlayedBox!.length < 11 
-                      ? mostlyPlayedBox!.length
-                      : 10,
+                  // itemCount: mostlyPlayedBox!.length < 11 
+                  //     ? mostlyPlayedBox!.length
+                  //     : 10,
+                  itemCount:  mostlyPlayedBox!.length,
                   itemBuilder: (context, index) {
                     final songs = mostlyPlayedBox!.values.toList()
                       ..sort((a, b) =>
                           (b.playCount ?? 0).compareTo(a.playCount ?? 0));
                     final song = songs[index];
                     return song.playCount! >= 5
+                      
     ? ListTile(
         title: Text(
           'This song played ${song.playCount} times',
@@ -176,62 +178,7 @@ class _MostlyPlayedScreenState extends State<MostlyPlayedScreen> {
           ),
         ),
       )
-    : SizedBox();  // If playCount is less than 5, show an empty container
-
-                   
-    //                 return 
-    //                  ListTile(
-                    
-    //   title: Text( 
-    //      song.playCount! < 5 ? '' : 'This song played ${song.playCount} times',
-    //     style: const TextStyle(color: AppGradients.whiteColor),
-    //     maxLines: 1,
-    //     overflow: TextOverflow.ellipsis,
-    //   ),
-    //  onTap: () {
-    //       List<MediaItem> song = songs
-    //     .map((item) => MediaItem(
-    //           id: item.uri,
-    //           title: item.tittle,
-    //           artist: item.artist,
-    //           album: item.id.toString(),
-    //         ))
-    //     .toList();
-        
-
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => Play(
-    //       songs: song,
-    //       initialIndex: index,
-    //       currentPosition: Duration.zero,
-    //     ),
-    //   ),
-    // );
-  
-    //  },
-    //   subtitle: Text(
-    //     song.tittle,
-    //     style: const TextStyle(color: Colors.white60),
-    //       maxLines: 1,
-    //     overflow: TextOverflow.ellipsis,
-    //   ),
-    //   leading: QueryArtworkWidget(
-    //     id: song.id,
-    //     type: ArtworkType.AUDIO,
-    //     artworkHeight: 40,
-    //     artworkWidth: 40,
-    //     artworkFit: BoxFit.cover,
-    //     nullArtworkWidget: const CircleAvatar(
-    //       backgroundColor: Color.fromARGB(255, 46, 19, 86),
-    //       child: Icon(
-    //         Icons.music_note,
-    //         color: AppGradients.whiteColor,
-    //       ),
-    //     ),
-    //   ),
-    // );
+   :const SizedBox();  // If playCount is less than 5, show an empty container
                   },
                 ),
                 

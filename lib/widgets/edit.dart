@@ -61,6 +61,7 @@ class PlaylistEditor {
                     // Call callback to update UI
                     onPlaylistRenamed(newPlaylistName);
 
+                    // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   }
                 }

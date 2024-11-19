@@ -1,12 +1,15 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/music_app/playlist_listscreen.dart';
 import 'package:musicapp/widgets/appgraient.dart';
+import 'package:musicapp/widgets/bottombar_option.dart';
 import 'package:musicapp/widgets/edit.dart';
 import 'package:musicapp/widgets/navigation.dart';
-import 'package:musicapp/widgets/options.dart';
 import 'package:musicapp/widgets/songListtile.dart';
+
 
 class Playlist extends StatefulWidget {
   String playlistName;
@@ -179,6 +182,7 @@ class _PlaylistState extends State<Playlist> {
                   padding: EdgeInsets.zero,
                   itemCount: playlistSongs?.length,
                   itemBuilder: (context, index) {
+                     final reversedIndex = playlistSongs!.length - 1 - index;
                     final songs = playlistSongs!.reversed.toList();
                     final song = songs[index];
                     return SongListTile(
@@ -188,11 +192,10 @@ class _PlaylistState extends State<Playlist> {
                         SongNavigationHelper.navigateToPlayScreen(
                             context: context,
                             boxValues: playlistSongs!,
-                            index: index);
+                            index:index);
                       },
                       onOptionsPressed: () {
-                        SongOptionsHelper.showOptionsBottomSheet(
-                            context: context, song: song);
+                        SongOptionsHelper2.showOptionsBottomSheet(context: context, song: song, index: reversedIndex, removeCallback: _removeFromPlaylist);
                       },
                     );
                   },
@@ -201,4 +204,14 @@ class _PlaylistState extends State<Playlist> {
       ]),
     );
   }
+   void _removeFromPlaylist(int index) async {
+    final playlistBox = await Hive.openBox<AllSongs>(widget.playlistName);
+    await playlistBox.deleteAt(index);
+    _loadSongs(); 
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Removed from playlist')),
+    );
+  }
+
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:musicapp/widgets/appgraient.dart';
 
-
 class PrivacyPolicy extends StatelessWidget {
   const PrivacyPolicy({super.key});
 

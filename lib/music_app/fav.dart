@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:musicapp/music_app/hive1/all_songs.dart';
 import 'package:musicapp/widgets/appgraient.dart';
+import 'package:musicapp/widgets/bottombar_option.dart';
 import 'package:musicapp/widgets/miniplayer.dart';
 import 'package:musicapp/widgets/navigation.dart';
-import 'package:musicapp/widgets/options.dart';
 import 'package:musicapp/widgets/songListtile.dart';
 
 class Fav extends StatefulWidget {
@@ -137,6 +137,7 @@ class _FavState extends State<Fav> {
                       itemBuilder: (context, index) {
                         final songs =
                             _favoritesBox!.values.toList().reversed.toList();
+                        final reversedIndex = _favoritesBox!.length - 1 - index;
                         final song = songs[index];
                         //    final song = _favoritesBox!.getAt(index);
                         //  final  songs = song(index)
@@ -144,8 +145,12 @@ class _FavState extends State<Fav> {
                             song: song,
                             index: index,
                             onOptionsPressed: () {
-                              SongOptionsHelper.showOptionsBottomSheet(
-                                  context: context, song: song);
+                              SongOptionsHelper2.showOptionsBottomSheet(
+                                context: context,
+                                song: song,
+                                index: reversedIndex,
+                                removeCallback: _removeFromFavorites,
+                              );
                             },
                             onTap: () {
                               SongNavigationHelper.navigateToPlayScreen(
@@ -163,62 +168,13 @@ class _FavState extends State<Fav> {
       ]),
     );
   }
-  // void _showOptionsBottomSheet(
-  //     BuildContext context, AllSongs? song, int index) {
-  //   showModalBottomSheet(
-  //     backgroundColor: const Color.fromARGB(255, 33, 32, 32),
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Container(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             ListTile(
-  //               title: Text(song?.tittle ?? "Unknown Title",
-  //                   style: const TextStyle(color: Colors.white)),
-  //               leading: const Icon(Icons.music_note,
-  //                   color: AppGradients.whiteColor),
-  //               subtitle: Text(song?.artist ?? "Unknown Artist",
-  //                   style: const TextStyle(color: Colors.white70)),
-  //             ),
-  //             const Divider(thickness: 0.4),
-  //             ListTile(
-  //               leading: const Icon(Icons.remove_circle_outline,
-  //                   color: AppGradients.whiteColor),
-  //               title: const Text('Remove from this playlist',
-  //                   style: TextStyle(color: AppGradients.whiteColor)),
-  //               onTap: () {
-  //                 _removeFromFavorites(index);
-  //                 Navigator.of(context).pop();
-  //               },
-  //             ),
-  //             ListTile(
-  //               leading: const Icon(Icons.add_rounded,
-  //                   color: AppGradients.whiteColor),
-  //               title: const Text('Add to playlist',
-  //                   style: TextStyle(color: AppGradients.whiteColor)),
-  //               onTap: () {
-  //                 Navigator.push(
-  //                     context,
-  //                     MaterialPageRoute(
-  //                         builder: (context) => AddTo(
-  //                               song: song,
-  //                             )));
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-  // void _removeFromFavorites(int index) {
-  //   setState(() {
-  //     _favoritesBox?.deleteAt(index);
-  //   });
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     const SnackBar(content: Text('Removed from favorites')),
-  //   );
-  // }
+
+  void _removeFromFavorites(int index) {
+    setState(() {
+      _favoritesBox?.deleteAt(index);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Removed from favorites')),
+    );
+  }
 }
