@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
@@ -174,7 +175,9 @@ class AudioPlayerSingleton {
         await addRecentlyPlayed(song);
       } 
     } catch (e) {
-      print("Error playing song: $e");
+      if (kDebugMode) {
+        print("Error playing song: $e");
+      }
     }
   }
 
@@ -201,7 +204,9 @@ class AudioPlayerSingleton {
           await _audioPlayer.seek(Duration.zero,
               index: shuffledIndexes[nextIndex]);
         } else {
-          print("Error: No shuffled indexes or current index available.");
+          if (kDebugMode) {
+            print("Error: No shuffled indexes or current index available.");
+          }
         }
       } else {
         // Normal playback
@@ -218,7 +223,9 @@ class AudioPlayerSingleton {
 
       _updateCurrentSong();
     } catch (e) {
-      print("Error in skipNext: $e");
+      if (kDebugMode) {
+        print("Error in skipNext: $e");
+      }
     }
   }
 
@@ -239,7 +246,9 @@ class AudioPlayerSingleton {
           await _audioPlayer.seek(Duration.zero,
               index: shuffledIndexes[previousIndex]);
         } else {
-          print("Error: No shuffled indexes or current index available.");
+          if (kDebugMode) {
+            print("Error: No shuffled indexes or current index available.");
+          }
         }
       } else {
         if (_audioPlayer.hasPrevious) {
@@ -257,7 +266,9 @@ class AudioPlayerSingleton {
 
       _updateCurrentSong();
     } catch (e) {
-      print("Error in skipPrevious: $e");
+      if (kDebugMode) {
+        print("Error in skipPrevious: $e");
+      }
     }
   }
 

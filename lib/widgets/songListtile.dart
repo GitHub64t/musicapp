@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:musicapp/widgets/appgraient.dart';
 import 'package:on_audio_query/on_audio_query.dart';

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
@@ -81,7 +82,9 @@ class _AllSongsState extends State<All_Songs> {
     if (hasPermission) {
       await fetchAndStoreSongs(); // Fetch songs after permission is granted
     } else {
-      print("Permission not granted.");
+      if (kDebugMode) {
+        print("Permission not granted.");
+      }
       setState(() {
         _isLoading = false; // Stop loading if permission is not granted
       });
